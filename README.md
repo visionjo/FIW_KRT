@@ -33,11 +33,12 @@ Its key features are listed as follows:
 - [ ] VGG Center-Face
 - [ ] ResNet with Metric Learning
 - [ ] ResNet Triplet-loss?
-
+- [ ] Cross Dataset Eval
+- [ ] Features from different layers of VGG
 
 
 ## API Contents
-### Common
+### common
 | Method | Description |
 | ------ | ------ |
 |  |  |
@@ -59,6 +60,6 @@ Its key features are listed as follows:
    
 ## Authors
 * **Joseph Robinson** - [Github](https://github.com/huskyjo) - [web](http://www.jrobsvision.com)
-
+* **Joseph Robinson** - [Github](https://github.com/wuyuebupt) - [web](http://www1.ece.neu.edu/~yuewu/)
 
 <a name="myfootnote1">1</a>: footie.
