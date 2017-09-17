@@ -1,6 +1,6 @@
 import numpy as np
 import sklearn.preprocessing as skpreprocess
-
+from scipy import linalg
 __author__ = 'Joseph Robinson'
 
 
@@ -21,29 +21,38 @@ def normalize(data):
     return skpreprocess.StandardScaler().fit_transform(data)
 
 
-def pca(data):
+def substract_mean(data):
     """
-    pca
-    :param data:
-    :param k:
+    Substracts mean for every row in data, yeilding a mean equal to 0.
 
-    :return:
     """
-    cov_mat = cov_matrix(data)
-    eig_vals, eig_vecs = np.linalg.eig(cov_mat)
+    mean = np.mean(data, axis=0)
+    return data - mean
 
-    for ev in eig_vecs:
-        # eigenvectors define directions of new axis, which should all the same unit length 1
-        np.testing.assert_array_almost_equal(1.0, np.linalg.norm(ev))
-    print('Eigenvectors OKAY')
-    """ 
-    Eigenvector(s) to drop that minimize information loss in lower-dimensional subspace eigenvalues are inspected.
-    Eigenvector(s) with smallest eigenvalue capture least information about data distribution (i.e., to be dropped)
+
+def pca(data, dims_rescaled_data=200):
     """
-    # Make a list of (eigenvalue, eigenvector) tuples
-    eig_pairs = [(np.abs(eig_vals[i]), eig_vecs[:, i]) for i in range(len(eig_vals))]
-
-    # Sort the (eigenvalue, eigenvector) tuples from high to low
-    eig_pairs.sort(key=lambda x: x[0], reverse=True)
-
-    return eig_pairs
+    returns: data transformed in 2 dims/columns + regenerated original data
+    pass in: data as 2D NumPy array
+    """
+    # m, n = data.shape
+    # mean center the data
+    data = substract_mean(data)
+    # data -= data.mean(axis=0)
+    # calculate the covariance matrix
+    cov = np.cov(data, rowvar=False)
+    # calculate eigenvectors & eigenvalues of the covariance matrix
+    # use 'eigh' rather than 'eig' since R is symmetric,
+    # the performance gain is substantial
+    evals, evecs = linalg.eigh(cov)
+    # sort eigenvalue in decreasing order
+    idx = np.argsort(evals)[::-1]
+    evecs = evecs[:,idx]
+    # sort eigenvectors according to same index
+    evals = evals[idx]
+    # select the first n eigenvectors (n is desired dimension
+    # of rescaled data array, or dims_rescaled_data)
+    evecs = evecs[:, :dims_rescaled_data]
+    # carry out the transformation on the data using eigenvectors
+    # and return the re-scaled data, eigenvalues, and eigenvectors
+    return np.dot(evecs.T, data.T).T, evals, evecs
