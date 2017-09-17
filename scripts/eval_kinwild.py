@@ -4,15 +4,13 @@ import numpy as np
 import glob
 import sklearn.metrics.pairwise as pw
 from sklearn.metrics import roc_curve, auc
-import common.utilities as utils
 import common.io as io
 import database.kinwild as kinwild
 import sklearn.preprocessing as skpreprocess
-import pickle
 from sklearn.decomposition import TruncatedSVD
-from scipy import sparse as sp
 
-layers = ['conv5_2', 'conv5_3', 'pool5', 'fc6', 'fc7']
+
+features = ['conv5_2', 'conv5_3', 'pool5', 'fc6', 'fc7']
 sub_dirs = ['father-dau', 'father-son',  'mother-dau', 'mother-son']
 
 dir_root = '/media/jrobby/Seagate Backup Plus Drive1/DATA/Kinship/KinFaceW-II/'
@@ -40,11 +38,11 @@ for ids in [1]:
     io.mkdir(d_out)
 
 
-    for layer in layers:
-        print("processing features from layer", layer)
-        feats1 = kinwild.load_all_features(dir_feats[ids] + layer + "/", pairs1)
-        feats2 = kinwild.load_all_features(dir_feats[ids] + layer + "/", pairs2)
-        dir_result = d_out + layer + "/"
+    for feature in features:
+        print("processing features from layer", feature)
+        feats1 = kinwild.load_all_features(dir_feats[ids] + feature + "/", pairs1)
+        feats2 = kinwild.load_all_features(dir_feats[ids] + feature + "/", pairs2)
+        dir_result = d_out + feature + "/"
         io.mkdir(dir_result)
         ts_matches = []
         sim = []
