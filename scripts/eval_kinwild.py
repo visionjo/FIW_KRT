@@ -116,8 +116,8 @@ for ids in [1]:
             np.savetxt(dir_out + "tpr.csv", tpr)
             np.savetxt(dir_out + "roc_auc.csv", [roc_auc])
             accs[jj] = roc_auc
-        # fpr, tpr, _ = roc_curve(np.array(ts_matches).flatten(), np.array(sim).flatten())
-        # roc_auc = auc(fpr, tpr)
+        fpr, tpr, _ = roc_curve(np.array(ts_matches).flatten(), np.array(sim).flatten())
+        roc_auc = auc(fpr, tpr)
         np.savetxt(dir_result + "fpr.csv", fpr)
         np.savetxt(dir_result + "tpr.csv", tpr)
         np.savetxt(dir_result + "roc_auc.csv", [accs.mean()])
