@@ -135,6 +135,10 @@ def mkdir(output):
     if not os.path.exists(output):
         os.makedirs(output)
 
+def filepath(filename):
+    """Return /a/b for filename /a/b/c.ext"""
+    (head, tail) = os.path.split(filename)
+    return head
 
 def newpath(filename, newdir):
     """Return /a/b for filename /a/b/c.ext"""
