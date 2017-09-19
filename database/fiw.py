@@ -203,15 +203,25 @@ def check_npairs(npairs, ktype, fid):
 
     return True
 
+
 def set_pairs(mylist, ids_in, kind, fid):
+    """
+    Adds items to mylist of unique pairs.
+    :param mylist:
+    :param ids_in:
+    :param kind:
+    :param fid:
+    :return:
+    """
     ids = [(p1, p2) if p1 < p2 else (p2, p1) for p1, p2 in zip(list(ids_in[0]), list(ids_in[1]))]
     ids = list(set(ids))
     for i in enumerate(ids):
         print(i)
         indices = list(np.array(i[1]) + 1)
-        mylist.append(Pair(mids=indices, fid=fid, kind='brothers'))
+        mylist.append(Pair(mids=indices, fid=fid, kind=kind))
         del indices
     return mylist
+
 
 def parse_brothers(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/Database/FIDs/',
                    f_rel_matrix='relationships.csv', f_mids='mids.csv'):
@@ -229,8 +239,7 @@ def parse_brothers(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild
     # family directories
     dirs_fid, fid_list = load_fids(dir_data)
 
-    nfids = len(fid_list)
-    print("{} families are being processed".format(nfids))
+    print("{} families are being processed".format(len(fid_list)))
     # Load MID LUT for all FIDs.
     df_mids = load_mids(dirs_fid, f_csv=f_mids)
 
@@ -241,7 +250,7 @@ def parse_brothers(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild
         # ids = [i for i, s in enumerate(genders) if 'Male' in s]
         rel_mat = np.array(df_relationships[i])
         genders = list(df_mids[i].Gender)
-        # zero out non-male subjects
+        # zero out female subjects
         rel_mat = specify_gender(rel_mat, genders, 'Male')
 
         brother_ids = np.where(rel_mat == 2)
@@ -268,10 +277,10 @@ def parse_sisters(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/
     """
 
     # family directories
+    kind = 'sisters'
     dirs_fid, fid_list = load_fids(dir_data)
 
-    nfids = len(fid_list)
-    print("{} families are being processed".format(nfids))
+    print("{} families are being processed".format(len(fid_list)))
     # Load MID LUT for all FIDs.
     df_mids = load_mids(dirs_fid, f_csv=f_mids)
 
@@ -283,25 +292,16 @@ def parse_sisters(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/
         rel_mat = np.array(df_relationships[i])
         genders = list(df_mids[i].Gender)
 
-
-        ids_not = [j for j, s in enumerate(genders) if 'Female' not in s]
-        rel_mat[ids_not, :] = 0
-        rel_mat[:, ids_not] = 0
+        # zero out female subjects
+        rel_mat = specify_gender(rel_mat, genders, 'Female')
 
         sister_ids = np.where(rel_mat == 2)
-        npairs = len(sister_ids[1])
-        if npairs == 0:
-            print("No sisters in " + str(fid))
+
+        if not check_npairs(len(sister_ids[1]), kind, fid):
             continue
-        if npairs % 2 != 0:
-            warn.warn("Number of pairs should be even, but there are" + str(npairs))
-        s_ids = [(s1, s2) if s1 < s2 else (s2, s1) for s1, s2 in zip(list(sister_ids[0]), list(sister_ids[1]))]
-        s_ids = list(set(s_ids))
-        for ids in enumerate(s_ids):
-            print(ids)
-            indices = list(np.array(ids[1]) + 1)
-            sisters.append(Pair(mids=indices, fid=fid, kind='sisters'))
-            del indices
+
+        # add to list of brothers
+        sisters = set_pairs(sisters, sister_ids, kind, fid)
 
     return sisters
 
@@ -322,8 +322,7 @@ def parse_parents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/
     # family directories
     dirs_fid, fid_list = load_fids(dir_data)
 
-    nfids = len(fid_list)
-    print("{} families are being processed".format(nfids))
+    print("{} families are being processed".format(len(fid_list)))
     # Load MID LUT for all FIDs.
     df_mids = load_mids(dirs_fid, f_csv=f_mids)
 
@@ -437,7 +436,7 @@ if __name__ == '__main__':
     do_sibs = True
     do_save = False
 
-    if do_sibs:
+    if False:
         print("Parsing Brothers")
         bros = parse_brothers(dir_data=dir_fids)
         print(len(bros))
@@ -449,7 +448,8 @@ if __name__ == '__main__':
             pair_set.write_pairs(out_bin + "bb1.csv")
 
         del bros, pair_set
-    if False:
+
+    if True:
         print("Parsing Sisters")
         sis = parse_sisters(dir_data=dir_fids)
         print(len(sis))
@@ -463,6 +463,7 @@ if __name__ == '__main__':
 
         del sis, pair_set
 
+    if False:
         print("Parsing Siblings")
         sibs = parse_siblings(dir_data=dir_fids)
         print(len(sibs))
@@ -498,3 +499,11 @@ if __name__ == '__main__':
         # FID: F0009
         # MIDS: (1, 2)
         # Type: brothers
+
+
+# 655
+# FID: F0003 ; MIDS: (1, 4) ; Type: sisters
+# FID: F0004 ; MIDS: (4, 5) ; Type: sisters
+# FID: F0006 ; MIDS: (3, 4) ; Type: sisters
+# FID: F0007 ; MIDS: (5, 6) ; Type: sisters
+# FID: F0007 ; MIDS: (4, 5) ; Type: sisters
