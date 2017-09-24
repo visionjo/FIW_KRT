@@ -11,6 +11,9 @@ from fiwdb.database import load_fids
 
 do_debug = False
 
+class Member(object):
+    def __init__(self, mid, gender, father, mother, brothers, sisters):
+        pass
 
 class Family(object):
     def __init__(self, surname='', fid=None, npids=0, nmember=0, mid_lut=None, relationship_matrix=None):
@@ -20,6 +23,7 @@ class Family(object):
         self.family_size = nmember
         self.relationship_matrix = relationship_matrix
         self.mid_lut = mid_lut
+        self.members = {}   # {MID: Member}
 
     def load_family(self):
         """
@@ -39,7 +43,7 @@ def load_families(dir_fids, f_rel_matrix='relationships.csv', f_mids='mids.csv')
     dirs_fid = glob.glob(dir_fids + '/F????/')
     fids = [d[-6:-1] for d in dirs_fid]
 
-    fid_lut = db.load_fid_csv()
+    fid_lut = db.load_fids()
     # Load MID LUT for all FIDs.
     df_mids = db.load_mids(dirs_fid, f_csv=f_mids)
 
@@ -496,7 +500,8 @@ def parse_grandparents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_
 
 
 def prepare_fids(dir_fid="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/",
-                 dirs_out="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIDs/"):
+                 dirs_out="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIDs/",
+                 do_save=False):
     """
     Parses FID CSV files and places in DB. Additionally, checks are made for inconsistency in labels.
     :param dir_fid:
@@ -509,7 +514,7 @@ def prepare_fids(dir_fid="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Dat
     fid_dicts = {io.file_base(f): pd.read_csv(f) for f in fid_files}
 
     # dfs_fids, fids = [(pd.read_csv(f), io.file_base(f)) for f in fid_files]
-
+    dfs_fams = []
     for fid in fid_dicts:
         # for each fid (i.e., iterate keys of dictionary)
         # print(fid)
@@ -540,7 +545,10 @@ def prepare_fids(dir_fid="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Dat
         df_fam = pd.DataFrame({'MID': mids})
         df_fam = df_fam.join(df_rel_mat.loc[ids][cols])
         df_fam = df_fam.join(pd.DataFrame({'Gender': genders, 'Name': names}))
-        df_fam.to_csv(dirs_out + "/" + fid + "/mid.csv", index=False)
+        if do_save:
+            df_fam.to_csv(dirs_out + "/" + fid + "/mid.csv", index=False)
+        dfs_fams.append(df_fam)
+    return dfs_fams
 
 
 if __name__ == '__main__':
@@ -549,7 +557,7 @@ if __name__ == '__main__':
     dir_fid = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
     do_sibs = True
     do_save = False
-    prepare_fids(dir_fid=dir_fid, dirs_out=dir_fids)
+    df_fam = prepare_fids(dir_fid=dir_fid, dirs_out=dir_fids)
     if do_sibs:
         print("Parsing Brothers")
         bros = parse_brothers(dir_data=dir_fids)
