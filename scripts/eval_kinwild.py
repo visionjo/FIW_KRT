@@ -37,7 +37,6 @@ for ids in [1]:
     d_out = dir_results + pair_types[ids] + "/"
     io.mkdir(d_out)
 
-
     for feature in features:
         print("processing features from layer", feature)
         feats1 = kinwild.load_all_features(dir_feats[ids] + feature + "/", pairs1)
