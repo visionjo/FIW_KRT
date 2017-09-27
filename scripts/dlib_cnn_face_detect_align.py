@@ -14,6 +14,7 @@
 #
 #   The examples/faces folder contains some jpg images of people.  You can run
 #   this program on them and see the detections by executing the
+# TODO merge with other dlib face detection script-- add flag to save jpegs and csv
 
 import sys
 import dlib
