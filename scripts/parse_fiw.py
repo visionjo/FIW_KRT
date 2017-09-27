@@ -1,3 +1,7 @@
+#!/usr/bin/python
+
+# Script to parse different pair types for kin verification.
+# TODO refactor
 import database.fiw as fiw
 import fiwdb.database as db
 
@@ -11,6 +15,7 @@ import fiwdb.database as db
 #     :param do_save:
 #     :param file_prefix:
 #     :return:
+# TODO function to replace each block of code below
 #     """
 
 out_bin = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Pairs/"
