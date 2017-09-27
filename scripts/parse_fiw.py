@@ -4,7 +4,7 @@ import fiwdb.database as db
 
 # def parse(dir_fids, kind, message="", do_save=False, file_prefix=""):
 #     """
-#
+#       Function to find pairs for specific type, load and return all face pairs.
 #     :param dir_fids:
 #     :param kind:
 #     :param message:
