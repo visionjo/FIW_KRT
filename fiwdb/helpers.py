@@ -1,7 +1,9 @@
 import fiwdb.database as db
 import warnings as warn
 import numpy as np
-
+import common.log as log
+logger = log.setup_custom_logger(__name__)
+logger.debug('Parse FIW')
 
 def check_npairs(npairs, ktype, fid):
     """
@@ -10,10 +12,12 @@ def check_npairs(npairs, ktype, fid):
     :return:    True if both test passes
     """
     if npairs == 0:
-        print("No " + ktype + " in " + str(fid))
+        logger.info("No {} in {}.".format(ktype, npairs))
+        # print("No " + ktype + " in " + str(fid))
         return False
     if npairs % 2 != 0:
-        warn.warn("Number of pairs should be even, but there are" + str(npairs))
+        logger.error("{}: Number of pairs should be even. No. pairs are {}".format(fid, npairs))
+        # warn.warn("Number of pairs should be even, but there are" + str(npairs))
         return False
 
     return True
@@ -50,7 +54,8 @@ def check_rel_matrix(rel_matrix, fid=''):
     # check diagonal is all zeros
     if any(rel_matrix.diagonal() != 0):
         messages.append("Non-zero elements found in diagonal of relationship matrix ({})".format(fid))
-        warn.warn(messages[len(messages) - 1])
+        messages.append(messages[len(messages) - 1])
+        # warn.warn(messages[len(messages) - 1])
         passes = False
 
     rids = db.load_rid_lut()
@@ -68,10 +73,9 @@ def check_rel_matrix(rel_matrix, fid=''):
         n_mismatches = (np.where(rel_matrix == int_pair[0], 1, 0) - np.where(rel_matrix == int_pair[1], 1, 0).T).sum()
 
         if n_mismatches > 0:
-            messages.append("Inconsistent labels ({}) in relationship matrix ({}) for RIDs {}".format(n_mismatches,
-                                                                                                      fid,
-                                                                                                      int_pair))
-            warn.warn(messages[len(messages) - 1])
+            messages.append("Inconsistency in {}: relationship matrix {}, RIDs {}".format(n_mismatches, fid, int_pair))
+            logger.error(messages[len(messages) - 1])
+            # warn.warn(messages[len(messages) - 1])
             passes = False
 
     return passes, messages

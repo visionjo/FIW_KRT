@@ -4,8 +4,11 @@
 # TODO refactor
 import database.fiw as fiw
 import fiwdb.database as db
+import common.log as log
+logger = log.setup_custom_logger(__name__)
+logger.debug('Parse FIW')
 
-
+import logging
 # def parse(dir_fids, kind, message="", do_save=False, file_prefix=""):
 #     """
 #       Function to find pairs for specific type, load and return all face pairs.
@@ -18,16 +21,21 @@ import fiwdb.database as db
 # TODO function to replace each block of code below
 #     """
 
+# log = logging.getLogger(__name__)
+
 out_bin = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Pairs/"
 dir_fids = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIDs/"
 dir_fid = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
+logger.info("Output Bin: {}\nFID folder: {}\n Anns folder: {}".format(out_bin, dir_fids, dir_fid))
 do_sibs = False
 do_parent_child = False
 do_gparent_gchild = False
+prepare_fids = True
+do_save = True
+logger.info("Parsing siblings: {}\nSaving Pairs: {}\n Parse FIDs: {}".format(do_sibs, do_save, prepare_fids))
 
-do_save = False
-
-df_fam = fiw.prepare_fids(dir_fid=dir_fid, dirs_out=dir_fids)
+if prepare_fids:
+    df_fam = fiw.prepare_fids(dir_fid=dir_fid, dirs_out=dir_fids, do_save=do_save)
 if do_sibs:
     print("Parsing Brothers")
     bros_pairs = fiw.parse_brothers(dir_data=dir_fids)
@@ -146,7 +154,7 @@ if do_parent_child:
     print(len(df_all_faces), "Face Pairs")
     del df_all_faces
 
-if False:
+if True:
     fmd, fms = fiw.tri_subjects(dir_data=dir_fids)
     print(len(fmd))
     for index in range(0, 5):
