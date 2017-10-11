@@ -1,9 +1,8 @@
 import glob
 import warnings as warn
-import itertools
 import numpy as np
 import pandas as pd
-import operator
+import csv
 
 import common.io as io
 import fiwdb.database as db
@@ -12,15 +11,25 @@ from fiwdb.database import load_fids
 
 from collections import defaultdict
 import common.log as log
+
 logger = log.setup_custom_logger(__name__)
 logger.debug('Parse FIW')
 
-import logging
+# import logging
+
 #
 # logging.basicConfig(filename="fiw_1.log", level=logging.ERROR, format="%(asctime)s:%(levelname)s:%(message)s")
 # log = logging.getLogger(__name__)
 
 do_debug = False
+
+
+def write_list_tri_pairs(fout, l_tuples):
+    with open(fout, 'w') as out:
+        csv_out = csv.writer(out)
+        csv_out.writerow(['father', 'mother', 'child'])
+        for row in l_tuples:
+            csv_out.writerow(row)
 
 
 class Member(object):
@@ -149,8 +158,8 @@ def get_face_pairs(dirs_fid, df_pairs):
         paths1 = glob.glob(dirs_fid + "/" + row['p1'] + "/*.jpg")
         paths2 = glob.glob(dirs_fid + "/" + row['p2'] + "/*.jpg")
 
-        faces1 = [p.replace(dir_fids + "/", "") for p in paths1]
-        faces2 = [p.replace(dir_fids + "/", "") for p in paths2]
+        faces1 = [p.replace(dirs_fid + "/", "").replace(dirs_fid, "") for p in paths1]
+        faces2 = [p.replace(dirs_fid + "/", "").replace(dirs_fid, "") for p in paths2]
 
         # print(faces1, faces2)
         for x in faces1:
@@ -247,13 +256,18 @@ def parse_sisters(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/
 
 
 def group_child_parents(ch_ids):
+    """
+    Group children with parents. This is done by using dictionaries with values as lists (i.e., parents MIDs) and keys
+    being MID of their child.
+    :param ch_ids:
+    :return: List of lists, each list contains a tuple pair
+    """
     groups = defaultdict(list)
 
     for obj in ch_ids:
         groups[obj[0]].append(obj)
 
-    return list(groups.values())
-
+    return groups
 
 
 def tri_subjects(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/Database/FIDs/', f_mids='mid.csv'):
@@ -267,7 +281,6 @@ def accumulate(l):
     Siblings RID is 2 and sister, of course, are Females. Thus, these are the factors we use to identify pairs.
 
     :param dir_data:        Directory containing folders of FIDs (e.g., F0001/, ..., F????/).
-    :param f_rel_matrix:
     :param f_mids:
     :return:
     """
@@ -299,7 +312,7 @@ def accumulate(l):
         p_ids = np.where(rel_mat == 4)
 
         if len(list(c_ids)) == 0:
-            logger.error("No pair of parents for child in {}.".format(fid))
+            logger.warn("No pair of parents for child in {}.".format(fid))
             # print("Two parents are not present for child")
             continue
 
@@ -308,86 +321,40 @@ def accumulate(l):
             # print("Unmatched pair")
             continue
         ch_ids = [(p1, p2) for p1, p2 in zip(list(c_ids[0]), list(c_ids[1]))]
-        # par_ids = [[p1, p2] for p1, p2 in zip(list(p_ids[0]), list(p_ids[1]))]
 
-        # check that children as 2 parents
-        # rows = np.array(ch_ids)[:, 1]
-        # cols = np.array(ch_ids)[:, 0]
-        # ids, counts = np.unique(rows, return_counts=True)
-        # count_check = counts != 2
-        # ids = np.where(count_check == False)[0]
-        # ids = n_unique
-
-
-        # cc_ids = cols[np.where(rows == ids[0])]
-
-        # p_cols = np.array(par_ids)[:, 0]
         cp_pairs = group_child_parents(ch_ids)
 
-        for cc in cp_pairs:
+        for cid, pids in cp_pairs.items():
             # pars = rows[np.where(cols == cc)]
-            if len(cc) != 2:
-                if len(cc) > 2:
-                    logger.error("{} parents in {}.".format(len(cc), fid))
+            if len(pids) != 2:
+                if len(pids) > 2:
+                    logger.error("{} parents in {}. {}".format(len(pids), fid, pids))
                     continue
                     # warn.warn("Three parents")
                 else:
                     continue
             try:
-                p_genders = [genders[cc[0][1]], genders[cc[1][1]]]
+                p_genders = [genders[pids[0][1]], genders[pids[1][1]]]
 
             except IndexError:
                 print()
             if "Male" in p_genders[0] and "Female" in p_genders[1]:
-                pars_ids = (cc[0][1] + 1, cc[1][1] + 1)
+                pars_ids = (pids[0][1] + 1, pids[1][1] + 1)
             elif "Male" in p_genders[1] and "Female" in p_genders[0]:
-                pars_ids = cc[1][1] + 1, cc[0][1] + 1
+                pars_ids = pids[1][1] + 1, pids[0][1] + 1
             else:
-                logger.error("Parents of same gender in {}.".format(fid))
+                logger.error("Parents of same gender in {}. {}".format(fid, pids))
                 continue
                 # warn.warn("Parents are of same gender for ", fid)
 
-            cmid = "FID/{}/MIDS{}".format(fid, cc[0][0] + 1)
-            fmid = "FID/{}/MIDS{}".format(fid, pars_ids[0])
-            mmid = "FID/{}/MIDS{}".format(fid, pars_ids[1])
-            if "Male" in genders[cc[0][0]]:
+            cmid = "{}/MID{}".format(fid, cid + 1)
+            fmid = "{}/MID{}".format(fid, pars_ids[0])
+            mmid = "{}/MID{}".format(fid, pars_ids[1])
+
+            if "Male" in genders[cid]:
                 fms.append((fmid, mmid, cmid))
             else:
                 fmd.append((fmid, mmid, cmid))
-
-
-                # # pp_ids = cols[np.where(rows == ids[1])]
-                # p_ids = np.where(rel_mat == 4)
-                #
-                # if len(c_ids[0]) != len(p_ids[0]):
-                #     warn.warn("Number of children and parents are different.")
-                #
-                # if not check_npairs(len(c_ids[0]), kind, fid):
-                #     continue
-
-
-                # # ch_ids = list(set(ch_ids))
-                # for p in par_ids:
-                #     print(p)
-                #     p_mid = list(np.array(p) + 1)[0]
-                #     c_mid = list(np.array(p) + 1)[1]
-                #
-                #     p_gender = genders[p_mid - 1]
-                #     c_gender = genders[c_mid - 1]
-                #     if 'Male' in p_gender:
-                #         # fathers
-                #         if 'Male' in c_gender:
-                #             # son
-                #             fs.append(Pair(mids=(p_mid, c_mid), fid=fid, kind='fs'))
-                #         else:
-                #             # daughter
-                #             fd.append(Pair(mids=(p_mid, c_mid), fid=fid, kind='fd'))
-                #     else:
-                #         # mothers
-                #         if 'Male' in c_gender:
-                #             ms.append(Pair(mids=(p_mid, c_mid), fid=fid, kind='ms'))
-                #         else:
-                #             md.append(Pair(mids=(p_mid, c_mid), fid=fid, kind='md'))
 
     return fmd, fms
 
@@ -421,8 +388,8 @@ def parse_parents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/
     for i, fid in enumerate(fid_list):
         # ids = [i for i, s in enumerate(genders) if 'Male' in s]
         # rel_mat = np.array(df_relationships[i])
+        rel_mat = db.parse_relationship_matrices(df_mids[i])
         genders = list(df_mids[i].Gender)
-
         # ids_not = [j for j, s in enumerate(genders) if 'Female' not in s]
         # rel_mat[ids_not, :] = 0
         # rel_mat[:, ids_not] = 0
@@ -430,7 +397,6 @@ def parse_parents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/
         # indices of matrix containing 4 or 1; that the matrix is inversed across the diagonal
         # mat_ids = np.where(rel_mat == 1) and np.where(rel_mat.T == 1), np.where(rel_mat == 1) and np.where(
         #     rel_mat.T == 4)
-        rel_mat = db.parse_relationship_matrices(df_mids[i])
         c_ids = np.where(rel_mat == 1)
         p_ids = np.where(rel_mat == 4)
         if len(c_ids[0]) != len(p_ids[0]):
@@ -469,7 +435,7 @@ def parse_parents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/
 
 
 def parse_grandparents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/Database/FIDs/',
-                       f_mids='mids.csv'):
+                       f_mids='mid.csv'):
     """
     Parse sister pairs by referencing member ID LUT and relationship matrix.
 
@@ -485,6 +451,7 @@ def parse_grandparents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_
     dirs_fid, fid_list = load_fids(dir_data)
 
     print("{} families are being processed".format(len(fid_list)))
+    # Load MID LUT for all FIDs.
     # Load MID LUT for all FIDs.
     df_mids = db.load_mids(dirs_fid, f_csv=f_mids)
 
@@ -526,20 +493,20 @@ def parse_grandparents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_
 
             p_gender = genders[p_mid - 1]
             c_gender = genders[c_mid - 1]
-            if 'Male' in p_gender:
+            if 'Female' in p_gender:
                 # fathers
-                if 'Male' in c_gender:
+                if 'Female' in c_gender:
                     # son
-                    gfgs.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='fs'))
+                    gfgs.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='gmgd'))
                 else:
                     # daughter
-                    gfgd.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='fd'))
+                    gfgd.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='gmgs'))
             else:
                 # mothers
-                if 'Male' in c_gender:
-                    gmgs.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='ms'))
+                if 'Female' in c_gender:
+                    gmgs.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='gfgd'))
                 else:
-                    gmgd.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='md'))
+                    gmgd.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='gfgd'))
 
     return gfgd, gfgs, gmgd, gmgs
 
@@ -598,12 +565,13 @@ def prepare_fids(dir_fid="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Dat
 
 
 if __name__ == '__main__':
-    out_bin = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Pairs/"
+
+    out_bin =  "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Pairs/"
     dir_fids = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIDs/"
     dir_fid = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
     logger.info("Output Bin: {}\nFID folder: {}\n Anns folder: {}".format(out_bin, dir_fids, dir_fid))
 
-    do_sibs = True
+    do_sibs = False
     do_save = False
     parse_fids = False
     logger.info("Parsing siblings: {}\nSaving Pairs: {}\n Parse FIDs: {}".format(do_sibs, do_save, parse_fids))
@@ -718,14 +686,6 @@ if __name__ == '__main__':
         print(len(df_all_faces))
         del df_all_faces
 
-    if True:
-        fmd, fms = tri_subjects(dir_data=dir_fids)
-        print(len(fmd))
-        for index in range(0, 5):
-            print(str(fmd[index]))
-        print(len(fms))
-        for index in range(0, 5):
-            print(str(fms[index]))
             # perpare_fids(dir_fid=dir_fid, dirs_out=dir_fids)
             # print()
             # bros = list(set(bros))

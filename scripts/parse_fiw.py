@@ -5,8 +5,8 @@
 import database.fiw as fiw
 import fiwdb.database as db
 import common.log as log
+
 logger = log.setup_custom_logger(__name__)
-logger.debug('Parse FIW')
 
 import logging
 # def parse(dir_fids, kind, message="", do_save=False, file_prefix=""):
@@ -23,14 +23,14 @@ import logging
 
 # log = logging.getLogger(__name__)
 
-out_bin = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Pairs/"
+out_bin = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Pairs2/"
 dir_fids = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIDs/"
 dir_fid = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
 logger.info("Output Bin: {}\nFID folder: {}\n Anns folder: {}".format(out_bin, dir_fids, dir_fid))
 do_sibs = False
-do_parent_child = False
+do_parent_child = True
 do_gparent_gchild = False
-prepare_fids = True
+prepare_fids = False
 do_save = True
 logger.info("Parsing siblings: {}\nSaving Pairs: {}\n Parse FIDs: {}".format(do_sibs, do_save, prepare_fids))
 
