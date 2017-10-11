@@ -130,6 +130,12 @@ def readtxt(ifile):
     content = [x.strip() for x in content]
     return content
 
+def sys_home():
+    """
+
+    :return: Home directory (platform agnostic)
+    """
+    return os.path.expanduser("~")
 
 def mkdir(output):
     if not os.path.exists(output):
