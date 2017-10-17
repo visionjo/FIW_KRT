@@ -1,5 +1,4 @@
 import fiwdb.database as db
-import warnings as warn
 import numpy as np
 import common.log as log
 logger = log.setup_custom_logger(__name__)
@@ -16,7 +15,7 @@ def check_npairs(npairs, ktype, fid):
         # print("No " + ktype + " in " + str(fid))
         return False
     if npairs % 2 != 0:
-        logger.error("{}: Number of pairs should be even. No. pairs are {}".format(fid, npairs))
+        logger.error("{}: Number of pairs {} should be even. No. pairs are {}".format(fid, ktype, npairs))
         # warn.warn("Number of pairs should be even, but there are" + str(npairs))
         return False
 
