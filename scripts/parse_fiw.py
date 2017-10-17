@@ -6,7 +6,7 @@ import database.fiw as fiw
 import fiwdb.database as db
 import common.log as log
 
-logger = log.setup_custom_logger(__name__)
+logger = log.setup_custom_logger(__name__, f_log='fiw_error_new.log')
 
 import logging
 # def parse(dir_fids, kind, message="", do_save=False, file_prefix=""):
@@ -22,13 +22,14 @@ import logging
 #     """
 
 # log = logging.getLogger(__name__)
+import common.io as io
 
-out_bin = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Pairs2/"
-dir_fids = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIDs/"
-dir_fid = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
+out_bin = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/Pairs2/"
+dir_fids = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/FIDs/"
+dir_fid = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
 logger.info("Output Bin: {}\nFID folder: {}\n Anns folder: {}".format(out_bin, dir_fids, dir_fid))
 do_sibs = False
-do_parent_child = True
+do_parent_child = False
 do_gparent_gchild = False
 prepare_fids = False
 do_save = True
@@ -154,14 +155,14 @@ if do_parent_child:
     print(len(df_all_faces), "Face Pairs")
     del df_all_faces
 
-if True:
-    fmd, fms = fiw.tri_subjects(dir_data=dir_fids)
-    print(len(fmd))
-    for index in range(0, 5):
-        print(str(fmd[index]))
-    print(len(fms))
-    for index in range(0, 5):
-        print(str(fms[index]))
+# if False:
+#     fmd, fms = fiw.tri_subjects(dir_data=dir_fids)
+#     print(len(fmd))
+#     for index in range(0, 5):
+#         print(str(fmd[index]))
+#     print(len(fms))
+#     for index in range(0, 5):
+#         print(str(fms[index]))
         # perpare_fids(dir_fid=dir_fid, dirs_out=dir_fids)
         # print()
         # bros = list(set(bros))

@@ -2,7 +2,7 @@ import glob
 
 import pandas as pd
 import numpy as np
-
+from common.io import sys_home as dir_home
 
 def get_unique_pairs(ids_in):
     """
@@ -14,7 +14,7 @@ def get_unique_pairs(ids_in):
     return list(set(ids))
 
 
-def load_rid_lut(f_csv="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIW_RIDs.csv"):
+def load_rid_lut(f_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIW_RIDs.csv"):
     """
 
     :param f_csv:
@@ -24,7 +24,7 @@ def load_rid_lut(f_csv="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Datab
     return pd.read_csv(f_csv, delimiter=',')
 
 
-def load_pid_lut(f_csv="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIW_PIDs_new.csv"):
+def load_pid_lut(f_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIW_PIDs_new.csv"):
     """
 
     :param f_csv:
@@ -33,7 +33,7 @@ def load_pid_lut(f_csv="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Datab
     return pd.read_csv(f_csv, delimiter='\t')
 
 
-def load_fid_lut(f_csv="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIW_FIDs.csv"):
+def load_fid_lut(f_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIW_FIDs.csv"):
     """
     Load FIW_FIDs.csv-- FID- Surname LUT
     :param f_csv:

@@ -11,6 +11,7 @@ from fiwdb.database import load_fids
 
 from collections import defaultdict
 import common.log as log
+from common.io import sys_home as dir_home
 
 logger = log.setup_custom_logger(__name__)
 logger.debug('Parse FIW')
@@ -511,8 +512,8 @@ def parse_grandparents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_
     return gfgd, gfgs, gmgd, gmgs
 
 
-def prepare_fids(dir_fid="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/",
-                 dirs_out="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIDs/",
+def prepare_fids(dir_fid=dir_home() + "/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/",
+                 dirs_out=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIDs/",
                  do_save=False):
     """
     Parses FID CSV files and places in DB. Additionally, checks are made for inconsistency in labels.
@@ -566,9 +567,9 @@ def prepare_fids(dir_fid="/Users/josephrobinson/Dropbox/Families_In_The_Wild/Dat
 
 if __name__ == '__main__':
 
-    out_bin =  "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Pairs/"
-    dir_fids = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIDs/"
-    dir_fid = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
+    out_bin =  dir_home() + "/Dropbox/Families_In_The_Wild/Database/Pairs/"
+    dir_fids = dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIDs/"
+    dir_fid = dir_home() + "/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
     logger.info("Output Bin: {}\nFID folder: {}\n Anns folder: {}".format(out_bin, dir_fids, dir_fid))
 
     do_sibs = False
