@@ -1,14 +1,19 @@
-import glob
+"""
+Module of utilities for handling FIW DB.
 
+Methods to download PIDs using URL, load Anns and LUTs, along with metadata (e.g., gender, mids, pair lists).
+"""
+import glob
 import pandas as pd
 import numpy as np
 import common.image as imutils
 from urllib.error import URLError, HTTPError
-# TODO urllib.request to handle thrown exceptions <p>Error: HTTP Error 403: Forbidden</p>
-
-
+import common.io as io
 import common.log as log
 from common.io import sys_home as dir_home
+
+# TODO urllib.request to handle thrown exceptions <p>Error: HTTP Error 403: Forbidden</p>
+# TODO modify fold2set with optional args that spefify which fold merges into which set (i.e., currently hard coded).
 
 logger = log.setup_custom_logger(__name__, f_log='fiwdb.log', level=log.INFO)
 logger.info('FIW-DB')
@@ -179,6 +184,35 @@ def specify_gender(rel_mat, genders, gender):
     return rel_mat
 
 
+def folds_to_sets(f_csv=dir_db + 'journal_data/Pairs/folds_5splits/', dir_out=dir_db + "journal_data/Pairs/sets/"):
+    """ Method used to merge 5 fold splits into 3 sets for RFIW (train, val, and test)"""
+
+    f_in = glob.glob(f_csv + '*-folds.csv')
+
+    for file in f_in:
+        # each list of pairs <FOLD, LABEL, PAIR_1, PAIR_2>
+        f_name = io.file_base(file)
+        print("\nProcessing {}\n".format(f_name))
+
+        df_pairs = pd.read_csv(file)
+
+        # merge to form train set
+        df_train = df_pairs[(df_pairs['fold'] == 1) | (df_pairs['fold'] == 5)]
+        df_train.to_csv(dir_out + "train/" + f_name.replace("-folds", "-train") + ".csv")
+
+        # merge to form val set
+        df_val = df_pairs[(df_pairs['fold'] == 2) | (df_pairs['fold'] == 4)]
+        df_val.to_csv(dir_out + "val/" + f_name.replace("-folds", "-val") + ".csv")
+
+        # merge to form test set
+        df_test = df_pairs[(df_pairs['fold'] == 3)]
+        df_test.to_csv(dir_out + "test/" + f_name.replace("-folds", "-test") + ".csv")
+
+        # print stats
+        print("{} Training;\t {} Val;\t{} Test".format(df_train['fold'].count(), df_val['fold'].count(),
+                                                       df_test['fold'].count()))
+
+
 class Pairs(object):
     def __init__(self, pair_list, kind=''):
         self.df_pairs = Pairs.list2table(pair_list)
@@ -204,7 +238,6 @@ class Pairs(object):
         # def __str__(self):
         #     return "FID: {}\nMIDS: ({}, {})\tType: {}".format(self.fid, self.mids[0], self.mids[1], self.type)
 
-
 class Pair(object):
     def __init__(self, mids, fid, kind=''):
         self.mids = mids
@@ -228,3 +261,4 @@ class Pair(object):
 
     def __lt__(self, other):
         return np.uint(self.fid[1::]) < np.uint(other.fid[1::])
+
