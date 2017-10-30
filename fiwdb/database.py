@@ -13,9 +13,10 @@ from common.io import sys_home as dir_home
 logger = log.setup_custom_logger(__name__, f_log='fiwdb.log', level=log.INFO)
 logger.info('FIW-DB')
 
+dir_db = str(dir_home()) + "/Dropbox/Families_In_The_Wild/Database/"
 
-def download_images(f_pid_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIW_PIDs_new.csv",
-                    dir_out=dir_home() + "/Dropbox/Families_In_The_Wild/Database/fiwimages/"):
+
+def download_images(f_pid_csv=dir_db + "FIW_PIDs_new.csv", dir_out=dir_db + "fiwimages/"):
     """
     Download FIW database by referencing PID LUT. Each PID is listed with corresponding URL. URL is downloaded and
     saved as <FID>/PID.jpg
@@ -24,7 +25,8 @@ def download_images(f_pid_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Databa
     """
     logger.info("FIW-DB-- Download_images!\n Source: {}\n Destination: {}".format(f_pid_csv, dir_out))
     # load urls (image location), pids (image name), and fids (output subfolder)
-    df_pid = load_pid_lut(f_pid_csv)
+    df_pid = load_pid_lut(str(f_pid_csv))
+
     df_io = df_pid[['FIDs', 'PIDs', 'URL']]
 
     logger.info("{} photos to download".format(int(df_io.count().mean())))
@@ -59,7 +61,7 @@ def get_unique_pairs(ids_in):
     return list(set(ids))
 
 
-def load_rid_lut(f_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIW_RIDs.csv"):
+def load_rid_lut(f_csv=dir_db + "FIW_RIDs.csv"):
     """
 
     :param f_csv:
@@ -69,7 +71,7 @@ def load_rid_lut(f_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIW_
     return pd.read_csv(f_csv, delimiter=',')
 
 
-def load_pid_lut(f_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIW_PIDs_new.csv"):
+def load_pid_lut(f_csv=dir_db + "FIW_PIDs_new.csv"):
     """
 
     :param f_csv:
@@ -78,7 +80,7 @@ def load_pid_lut(f_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIW_
     return pd.read_csv(f_csv, delimiter='\t')
 
 
-def load_fid_lut(f_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIW_FIDs.csv"):
+def load_fid_lut(f_csv=dir_db + "FIW_FIDs.csv"):
     """
     Load FIW_FIDs.csv-- FID- Surname LUT
     :param f_csv:
