@@ -7,6 +7,8 @@ import common.utilities as utils
 import csv
 import matplotlib.image as mpimg
 import tempfile
+import urllib
+import urllib.request
 
 __author__ = 'Joseph Robinson'
 
@@ -46,6 +48,13 @@ def list(imdir):
     return [os.path.abspath(os.path.join(imdir, item)) for item in os.listdir(imdir) if
             (io.is_img(item) and not io.is_hidden_file(item))]
 
+
+def saveimage(f_image, image):
+    """ Save image"""
+    # check that folder of image file exists; else, make it
+    io.mkdir(io.parent_dir(f_image))
+
+    cv2.imwrite(f_image, image)
 
 def savelist(imdir, outfile):
     """Write out all images in a directory to a provided file with each line containing absolute path to image"""
@@ -108,6 +117,18 @@ def temp(ext='jpg'):
 def temp_png():
     """Create a temporay PNG file"""
     return temp('png')
+
+
+def url_to_image(url):
+    """
+  a helper function that downloads the image, converts it to a NumPy array,
+  and then reads it into OpenCV format
+  """
+    resp = urllib.request.urlopen(url)
+    image = np.asarray(bytearray(resp.read()), dtype="uint8")
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    # return the image
+    return image
 
 
 def writejet(img, imfile=None):

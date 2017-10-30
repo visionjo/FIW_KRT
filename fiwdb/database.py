@@ -2,7 +2,52 @@ import glob
 
 import pandas as pd
 import numpy as np
+import common.image as imutils
+from urllib.error import URLError, HTTPError
+# TODO urllib.request to handle thrown exceptions <p>Error: HTTP Error 403: Forbidden</p>
+
+
+import common.log as log
 from common.io import sys_home as dir_home
+
+logger = log.setup_custom_logger(__name__, f_log='fiwdb.log', level=log.INFO)
+logger.info('FIW-DB')
+
+
+def download_images(f_pid_csv=dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIW_PIDs_new.csv",
+                    dir_out=dir_home() + "/Dropbox/Families_In_The_Wild/Database/fiwimages/"):
+    """
+    Download FIW database by referencing PID LUT. Each PID is listed with corresponding URL. URL is downloaded and
+    saved as <FID>/PID.jpg
+    :type f_pid_csv: object
+    :type dir_out: object
+    """
+    logger.info("FIW-DB-- Download_images!\n Source: {}\n Destination: {}".format(f_pid_csv, dir_out))
+    # load urls (image location), pids (image name), and fids (output subfolder)
+    df_pid = load_pid_lut(f_pid_csv)
+    df_io = df_pid[['FIDs', 'PIDs', 'URL']]
+
+    logger.info("{} photos to download".format(int(df_io.count().mean())))
+
+    for i, img_url in enumerate(df_io['URL']):
+        if i == 100:
+            return
+        try:
+            f_out = str(dir_out) + df_io['FIDs'][i] + "/" + df_io['PIDs'][i] + ".jpg"
+            img = imutils.url_to_image(img_url)
+            logger.info("Downloading {}\n{}\n".format(df_io['PIDs'][i], img_url))
+            imutils.saveimage(f_out, img)
+        except Exception as e:
+            logger.error("Error with {}\n{}\n".format(df_io['PIDs'][i], img_url))
+            error_message = "<p>Error: %s</p>\n" % str(e)
+            logger.error(error_message)
+        except HTTPError as e:
+            logger.error("The server couldn't fulfill the request.")
+            logger.error("Error code: ", e.code)
+        except URLError as e:
+            logger.error("Failed to reach a server.")
+            logger.error("Reason: ", e.reason)
+
 
 def get_unique_pairs(ids_in):
     """
