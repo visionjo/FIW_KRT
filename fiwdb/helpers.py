@@ -72,7 +72,9 @@ def check_rel_matrix(rel_matrix, fid=''):
         n_mismatches = (np.where(rel_matrix == int_pair[0], 1, 0) - np.where(rel_matrix == int_pair[1], 1, 0).T).sum()
 
         if n_mismatches > 0:
-            messages.append("Inconsistency in {}: relationship matrix {}, RIDs {}".format(n_mismatches, fid, int_pair))
+            messages.append("Inconsistency in {}: relationship matrix {}, RIDs {}\n{}\n"
+                            .format(n_mismatches, fid, int_pair, np.where(rel_matrix == int_pair[0], 1, 0)
+                                    - np.where(rel_matrix == int_pair[1], 1, 0).T))
             logger.error(messages[len(messages) - 1])
             # warn.warn(messages[len(messages) - 1])
             passes = False
