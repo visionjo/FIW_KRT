@@ -56,6 +56,5 @@ Its key features are listed as follows:
    
 ## Authors
 * **Joseph Robinson** - [Github](https://github.com/huskyjo) - [web](http://www.jrobsvision.com)
-* **Joseph Robinson** - [Github](https://github.com/wuyuebupt) - [web](http://www1.ece.neu.edu/~yuewu/)
 
 <a name="myfootnote1">1</a>: footie.
