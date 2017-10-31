@@ -33,26 +33,6 @@ Its key features are listed as follows:
 - [ ] Features from different layers of VGG
 
 
-## API Contents
-### common
-| Method | Description |
-| ------ | ------ |
-|  |  |
-|  |  |
-|  |  |
-
-### components
-![Image of component API](docs/images/api_class_flowchart.png)
-
-| Method | Description |
-| ------ | ------ |
-|  |  |
-|  |  |
-|  |  |
-
-
-
-
    
 ## Authors
 * **Joseph Robinson** - [Github](https://github.com/huskyjo) - [web](http://www.jrobsvision.com)
