@@ -10,12 +10,8 @@ This API serves as the main code-base for kinship effort with FIW database.
 
 Its key features are listed as follows:
   - *database* package
-    - A
-        - s
         
   - *fiw* package
-    - B
-        - b
     
     
 ## Installation
