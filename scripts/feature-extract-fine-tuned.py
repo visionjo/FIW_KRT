@@ -2,72 +2,74 @@
 # docker run -ti -v /home/jrobby/Dropbox/Families_In_The_Wild/Database/FIDs:/data -v /home/jrobby/Dropbox/Families_In_The_Wild/python/models:/models -v /media/jrobby/Seagate\ Backup\ Plus\ Drive1/FIW_dataset/FIW_Extended/feats:/feats -v /home/jrobby/Dropbox/github/FIW_KRT:/code  bvlc/caffe:gpu bash
 
 # TODO: PCA
+# TODO refactor code, such to enable interface for options, opposed to hard coded as done currently.
 import numpy as np
 import glob
-import common.utilities as utils
-import sklearn.metrics.pairwise as pw
-from sklearn.metrics import roc_curve, auc
 import common.io as io
 import fiwdb.database as fiwdb
-import sklearn.preprocessing as skpreprocess
-from sklearn.decomposition import TruncatedSVD
-import argparse
 import os
 import common.log as log
 import frameworks.pycaffe.net_wrapper as cw
 import frameworks.pycaffe.tools as caffe_tools
 
 
-logger = log.setup_custom_logger(__name__, f_log='fiw-feat-extractor.log', level=log.INFO)
+logger = log.setup_custom_logger(__name__, f_log='kinwildW-feat-extractor.log', level=log.INFO)
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='FIW deep feature extractor.',
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-l', '--layer', default='fc7', help='Layers of DCNN to extract features from',
-                        choices=['conv5_2', 'conv5_3', 'pool5', 'fc6', 'fc7'])
-    parser.add_argument('-d', '--model_def', help="File path to prototxt (arch definition).",
-                        default="/home/jrobby/Dropbox/Families_In_The_Wild/python/models/VGG_FACE_deploy.prototxt")
-    parser.add_argument('-w', '--weights', help="File path to weights (i.e., *.caffemodel).",
-                        default="/home/jrobby/Dropbox/Families_In_The_Wild/python/models/VGG_FACE.caffemodel")
-    parser.add_argument('-i', '--input',
-                        default=io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/FIDs/",
-                        help='Image directory.')
-    parser.add_argument('-o', '--output',
-                        default="/media/jrobby/Seagate Backup Plus Drive1/FIW_dataset/FIW_Extended/feats/vgg_face/",
-                        help='Directory in which output is store folder of features named after layer.')
-    parser.add_argument('-m', '--mode', default='cpu', choices=['cpu', 'gpu'], help='Run on cpu or gpu.')
-    parser.add_argument('-gpu', '--gpu_id', default=0)
-    parser.add_argument('--dims', default=200, help="Dimension to reduce features (for --pca)")
+# if __name__ == "__main__":
 
-    parser.add_argument('--overwrite', action='store_true', help="Overwrite existing files.")
-    args = parser.parse_args()
-    dout = os.path.join(args.output, args.layer) + "/"
+layer = 'fc5'
+model_def = '/model/face_deploy.prototxt'
+weights = '/model/face_train_test_iter_1600.caffemodel'
+input = '/data/KinFaceW-II/images/'
+output = '/data/KinFaceW-II/features/fine-tuned/'
+mode = 'cpu'
+dims = 200
 
-    logger.info("Output Directory: {}\nInput Image Directory: {}\n".format(args.output, args.input))
+types = ['father-dau', 'father-son', 'mother-dau', 'mother-son']
+gpu_id = 0
+overwrite = False
 
-    io.mkdir(dout)
-    my_net = cw.CaffeWrapper(model_def=args.model_def, gpu_id=args.gpu_id, mode=args.mode, model_weights=args.weights,
-                          do_init=True)
+dout = os.path.join(output, layer) + "/"
 
-    dirs_fid, fids = fiwdb.load_fids(args.input)
-    ifiles = glob.glob(args.input + "*/MID*/*.jpg")
-    ofiles = [dout + str(f).replace(args.input, "").replace(".jpg", ".csv") for f in ifiles]
-    # layers = args.layers
-    for ifile in ifiles:
-        ofile = dout + str(ifile).replace(args.input, "").replace(".jpg", ".csv")
-        if os.path.isfile(ofile):
+logger.info("Output Directory: {}\nInput Image Directory: {}\n".format(output, input))
+
+io.mkdir(dout)
+if mode == 'gpu':
+    my_net = cw.CaffeWrapper(model_def=model_def, gpu_id=gpu_id, mode=mode, model_weights=weights, do_init=True)
+else:
+    my_net = cw.CaffeWrapper(model_def=model_def, mode=mode, model_weights=weights, do_init=False)
+
+
+for ptype in types:
+    # each pair type
+    print("Processing image pairs of type {}".format(ptype))
+    # dir_images = []
+    dir_images = input + ptype + "/"
+    dirs_fid, fids = fiwdb.load_fids(dir_images)
+    im_files = glob.glob(input + "*/MID*/*.jpg")
+    feat_files = [dout + str(f).replace(input, "").replace(".jpg", ".csv") for f in im_files]
+    print("{} faces to extract features from.".format(len(feat_files)))
+    for in_file, f_file in zip(im_files[0], feat_files[0]):
+        # layers = layers
+        # ofile = dout + str(ifile).replace(input, "").replace(".jpg", ".csv")
+        if io.mkdir(in_file):
             continue
-        logger.info("Extracting features: {}\n".format(ofile))
-        fname = io.file_base(ifile)
+        # if os.path.isfile(in_file):
 
-        image = caffe_tools.load_prepare_image_vgg(ifile)
+        logger.info("Extracting feature for: {}\n".format(in_file))
+        fname = io.file_base(in_file)
+
+        image = caffe_tools.load_prepare_image_vgg(in_file)
         my_net.net.blobs['data'].data[...] = image
         output = my_net.net.forward()
 
-        io.mkdir(io.filepath(ofile))
-        feat = my_net.net.blobs[args.layer].data[0]
-        np.savetxt(ofile, feat.flatten(), delimiter=',')  # X is an array
+        # io.mkdir(io.filepath(in_file))
+        feat = my_net.net.blobs[layer].data[0]
+        logger.info("Writing feature to disk: {}\n".format(f_file))
+        np.savetxt(f_file, feat.flatten(), delimiter=',')  # X is an array
+
+
 #
 # # net = net.net
 # # # dir_data = '/data/FIDs2/'
