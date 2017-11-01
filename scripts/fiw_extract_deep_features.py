@@ -20,10 +20,11 @@ import frameworks.pycaffe.tools as caffe_tools
 
 logger = log.setup_custom_logger(__name__, f_log='fiw-feat-extractor.log', level=log.INFO)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='FIW deep feature extractor.',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--layer', default='fc7', help='Layers of DCNN to extract features from',
+    parser.add_argument('-l', '--layer', default='fc7', help='Layers of DCNN to extract features from',
                         choices=['conv5_2', 'conv5_3', 'pool5', 'fc6', 'fc7'])
     parser.add_argument('-d', '--model_def', help="File path to prototxt (arch definition).",
                         default="/home/jrobby/Dropbox/Families_In_The_Wild/python/models/VGG_FACE_deploy.prototxt")

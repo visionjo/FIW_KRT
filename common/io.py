@@ -130,6 +130,7 @@ def readtxt(ifile):
     content = [x.strip() for x in content]
     return content
 
+
 def sys_home():
     """
 
@@ -137,9 +138,18 @@ def sys_home():
     """
     return os.path.expanduser("~")
 
+
 def mkdir(output):
+    """
+    Make directory if does not already exist.
+    :param output:
+    :return:    True if no directory exists, and 'output' was made; else, False.
+    """
     if not os.path.exists(output):
         os.makedirs(output)
+        return True
+    return False
+
 
 def filepath(filename):
     """Return /a/b for filename /a/b/c.ext"""

@@ -11,6 +11,8 @@ from urllib.error import URLError, HTTPError
 import common.io as io
 import common.log as log
 from common.io import sys_home as dir_home
+import operator
+import csv
 
 # TODO urllib.request to handle thrown exceptions <p>Error: HTTP Error 403: Forbidden</p>
 # TODO modify fold2set with optional args that spefify which fold merges into which set (i.e., currently hard coded).
@@ -19,6 +21,7 @@ logger = log.setup_custom_logger(__name__, f_log='fiwdb.log', level=log.INFO)
 logger.info('FIW-DB')
 
 dir_db = str(dir_home()) + "/Dropbox/Families_In_The_Wild/Database/"
+dir_fid_root = str(dir_home()) + "/Dropbox/Families_In_The_Wild/Database/journal_data/FIDs/"
 
 
 def download_images(f_pid_csv=dir_db + "FIW_PIDs_new.csv", dir_out=dir_db + "fiwimages/"):
@@ -28,6 +31,7 @@ def download_images(f_pid_csv=dir_db + "FIW_PIDs_new.csv", dir_out=dir_db + "fiw
     :type f_pid_csv: object
     :type dir_out: object
     """
+
     logger.info("FIW-DB-- Download_images!\n Source: {}\n Destination: {}".format(f_pid_csv, dir_out))
     # load urls (image location), pids (image name), and fids (output subfolder)
     df_pid = load_pid_lut(str(f_pid_csv))
@@ -44,16 +48,16 @@ def download_images(f_pid_csv=dir_db + "FIW_PIDs_new.csv", dir_out=dir_db + "fiw
             img = imutils.url_to_image(img_url)
             logger.info("Downloading {}\n{}\n".format(df_io['PIDs'][i], img_url))
             imutils.saveimage(f_out, img)
-        except Exception as e:
+        except Exception as e0:
             logger.error("Error with {}\n{}\n".format(df_io['PIDs'][i], img_url))
-            error_message = "<p>Error: %s</p>\n" % str(e)
+            error_message = "<p>Error: %s</p>\n" % str(e0)
             logger.error(error_message)
-        except HTTPError as e:
+        except HTTPError as e1:
             logger.error("The server couldn't fulfill the request.")
-            logger.error("Error code: ", e.code)
-        except URLError as e:
+            logger.error("Error code: ", e1.code)
+        except URLError as e2:
             logger.error("Failed to reach a server.")
-            logger.error("Reason: ", e.reason)
+            logger.error("Reason: ", e2.reason)
 
 
 def get_unique_pairs(ids_in):
@@ -94,7 +98,7 @@ def load_fid_lut(f_csv=dir_db + "FIW_FIDs.csv"):
     return pd.read_csv(f_csv, delimiter='\t')
 
 
-def load_fids(dirs_fid):
+def load_fids(dirs_fid=dir_fid_root):
     """
     Function loads fid directories and labels.
     :param dirs_fid: root folder containing FID directories (i.e., F0001-F1000)
@@ -115,10 +119,10 @@ def load_mids(dirs_fid, f_csv='mid.csv'):
     :return:
     """
 
-    return [pd.read_csv(d + f_csv) for d in dirs_fid]
+    return [pd.read_csv(d + "/" + f_csv) for d in dirs_fid]
 
 
-def load_relationship_matrices(dirs_fid, f_csv='relationships.csv'):
+def load_relationship_matrices(dirs_fid=dir_fid_root, f_csv='relationships.csv'):
     """
     Load CSV file containing member information, i.e., {MID : ID, Name, Gender}
     :type f_csv:        file name of CSV files containing member labels
@@ -213,6 +217,110 @@ def folds_to_sets(f_csv=dir_db + 'journal_data/Pairs/folds_5splits/', dir_out=di
                                                        df_test['fold'].count()))
 
 
+def parsing_families(f_csv='mid.csv'):
+    fid_list = load_fids(dir_fid_root)[0]
+    fid_list.sort()
+    tup_mid = [(d[-6:-1], pd.read_csv(d + "/" + f_csv)) for d in fid_list]
+
+    nmembers = [int(mid[1].count().mean()) for mid in tup_mid]
+
+    ids = np.array(nmembers).__lt__(3)
+    df_mid = [(mid[1], mid[0]) for mid in tup_mid]
+    # df_vals = [df[0].values[:, 0:-2] for df in df_mid]
+
+    fam_list = []
+    # df2 = pd.DataFrame(columns=('FID','MID','val', 'nrel'))
+    fam_list2 = []
+    tr_mids = []
+    for i, df in enumerate(df_mid):
+        # vals = [d[0].values[:, 0:-2] for d in df]
+        vals = df[0].values[:, 1:-2]
+        # vals = np.zeros_like()
+        votes = np.zeros_like(vals)
+        # vals=df.values[:, 0:-2]
+        votes[(vals == 4) | (vals == 1)] += 3
+        votes[(vals == 2)] += 2
+        votes[(vals == 6) | (vals == 3)] += 1
+        # votes[((df.values[:,0:-2]) == 4) | ((df.values[:,0:-2]) == 1)] += 3
+        # votes[((df.values[:,0:-2]) == 2)] += 2
+        # votes[((df.values[:,0:-2]) == 6) | ((df.values[:,0:-2]) == 3)] += 1
+        # np.array(votes.sum(axis=1)).max()
+        mid_list = np.linspace(1, vals.shape[0], num= vals.shape[0])
+
+        max_index, max_value = max(enumerate(vals.sum(axis=1)), key=operator.itemgetter(1))
+        vals[max_index] = 0
+        mid_list[max_index]=0
+        max_index2, max_value2 = max(enumerate(vals.sum(axis=1)), key=operator.itemgetter(1))
+        mid_list[max_index2]=0
+        nrelationships = np.size(np.nonzero(votes[max_index,:]))
+
+        # fam_list.append((zip(*df), max_index, max_value, nrelationships))
+        fam_list.append((*df, max_index, max_value, nrelationships))
+
+        mlist = ("MID" + str(int(mid)) for mid in mid_list if mid > 0)
+
+        if nrelationships >= 3:
+            fam_list2.append([df[1], "MID" + str(1 + max_index), max_value, nrelationships, "MID" + str(1 + max_index2), max_value2, np.size(np.nonzero(votes[max_index2,:])), *mlist])
+            tr_mids.append((df[1], mlist))
+
+    ofile = open('ttest.csv', "w")
+
+    writer = csv.writer(ofile, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+
+    for row in fam_list2:
+        writer.writerow(row)
+    ofile.close()
+
+    for fl in fam_list2:
+        print(fl)
+
+    df_fams = pd.DataFrame(fam_list, columns=['rel', 'MID', 'val', 'nrel'])
+    te_list = []
+    tr_list = []
+    val_list = []
+    for tt in fam_list2:
+        te_list.append(glob.glob(dir_fid_root + tt[0] + "/" + tt[1] + "/*.jpg"))
+
+    for tt in fam_list2:
+        val_list.append(glob.glob(dir_fid_root + tt[0] + "/" + tt[4] + "/*.jpg"))
+
+    for tt in fam_list2:
+        for ttt in list(tt[7:]):
+            tr_list.append(glob.glob(dir_fid_root + tt[0] + "/" + ttt + "/*.jpg"))
+
+
+    with open('test_no_labels.list', 'w') as f:
+        for _list in te_list:
+            if len(_list) == 0:
+                continue
+            fid = _list[0][69:74]
+            # for _string in _list:
+            for token in _list:
+                f.write(str(token) + " " + fid + '\n')
+
+    with open('val_no_labels.list', 'w') as f:
+        for _list in val_list:
+            if len(_list) == 0:
+                continue
+            fid = _list[0][69:74]
+            # for _string in _list:
+            for token in _list:
+                f.write(str(token) + " " + fid + '\n')
+
+    with open('train.list', 'w') as f:
+        for _list in tr_list:
+            if len(_list) == 0:
+                continue
+            fid = _list[0][69:74]
+            # for _string in _list:
+            for token in _list:
+                f.write(str(token) + " " + fid + '\n')
+
+                #     print(io.parent_dir(_list))
+                # # f.seek(0)
+                # f.write(str(_string) + '\n')
+
+    ofile  = open('test.;', "w")
 class Pairs(object):
     def __init__(self, pair_list, kind=''):
         self.df_pairs = Pairs.list2table(pair_list)
@@ -238,6 +346,7 @@ class Pairs(object):
         # def __str__(self):
         #     return "FID: {}\nMIDS: ({}, {})\tType: {}".format(self.fid, self.mids[0], self.mids[1], self.type)
 
+
 class Pair(object):
     def __init__(self, mids, fid, kind=''):
         self.mids = mids
@@ -261,4 +370,3 @@ class Pair(object):
 
     def __lt__(self, other):
         return np.uint(self.fid[1::]) < np.uint(other.fid[1::])
-
