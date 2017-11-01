@@ -10,12 +10,8 @@ This API serves as the main code-base for kinship effort with FIW database.
 
 Its key features are listed as follows:
   - *database* package
-    - A
-        - s
         
   - *fiw* package
-    - B
-        - b
     
     
 ## Installation
@@ -37,29 +33,8 @@ Its key features are listed as follows:
 - [ ] Features from different layers of VGG
 
 
-## API Contents
-### common
-| Method | Description |
-| ------ | ------ |
-|  |  |
-|  |  |
-|  |  |
-
-### components
-![Image of component API](docs/images/api_class_flowchart.png)
-
-| Method | Description |
-| ------ | ------ |
-|  |  |
-|  |  |
-|  |  |
-
-
-
-
    
 ## Authors
 * **Joseph Robinson** - [Github](https://github.com/huskyjo) - [web](http://www.jrobsvision.com)
-* **Joseph Robinson** - [Github](https://github.com/wuyuebupt) - [web](http://www1.ece.neu.edu/~yuewu/)
 
 <a name="myfootnote1">1</a>: footie.
