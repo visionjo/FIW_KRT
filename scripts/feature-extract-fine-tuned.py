@@ -2,6 +2,7 @@
 # docker run -ti -v /home/jrobby/Dropbox/Families_In_The_Wild/Database/FIDs:/data -v /home/jrobby/Dropbox/Families_In_The_Wild/python/models:/models -v /media/jrobby/Seagate\ Backup\ Plus\ Drive1/FIW_dataset/FIW_Extended/feats:/feats -v /home/jrobby/Dropbox/github/FIW_KRT:/code  bvlc/caffe:gpu bash
 
 # TODO: PCA
+# TODO refactor code, such to enable interface for options, opposed to hard coded as done currently.
 import numpy as np
 import glob
 import common.io as io
