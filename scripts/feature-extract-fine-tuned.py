@@ -6,6 +6,7 @@
 import numpy as np
 import glob
 import common.io as io
+
 import fiwdb.database as fiwdb
 import os
 import common.log as log
@@ -17,57 +18,72 @@ logger = log.setup_custom_logger(__name__, f_log='kinwildW-feat-extractor.log', 
 
 
 # if __name__ == "__main__":
-
-layer = 'fc5'
 model_def = '/model/face_deploy.prototxt'
 weights = '/model/face_train_test_iter_1600.caffemodel'
-input = '/data/KinFaceW-II/images/'
-output = '/data/KinFaceW-II/features/fine-tuned/'
+input = '/data/KinFaceW-I/images/'
+output = '/data/KinFaceW-I/features/fine-tuned/'
+io.mkdir(output)
 mode = 'cpu'
 dims = 200
-
+layer = 'fc5'
 types = ['father-dau', 'father-son', 'mother-dau', 'mother-son']
 gpu_id = 0
 overwrite = False
 
-dout = os.path.join(output, layer) + "/"
+layers = ['fc5', 'conv5_5', 'conv5_4']
+for l in layers:
 
-logger.info("Output Directory: {}\nInput Image Directory: {}\n".format(output, input))
+    dout = output + "/" + l + "/"
+    io.mkdir(dout)
+    logger.info("Output Directory: {}\nInput Image Directory: {}\n".format(output, input))
 
-io.mkdir(dout)
-if mode == 'gpu':
-    my_net = cw.CaffeWrapper(model_def=model_def, gpu_id=gpu_id, mode=mode, model_weights=weights, do_init=True)
-else:
-    my_net = cw.CaffeWrapper(model_def=model_def, mode=mode, model_weights=weights, do_init=False)
+    io.mkdir(dout)
+    if mode == 'gpu':
+        my_net = cw.CaffeWrapper(model_def=model_def, gpu_id=gpu_id, mode=mode, model_weights=weights, do_init=True)
+    else:
+        my_net = cw.CaffeWrapper(model_def=model_def, mode=mode, model_weights=weights, do_init=False)
+    my_net.init()
 
+    for ptype in types:
+        # each pair type
+        print("Processing image pairs of type {}".format(ptype))
+        # dir_images = []
+        dir_images = input + ptype + "/"
+        io.mkdir(dout + ptype)
+        # dirs_fid, fids = fiwdb.load_fids(dir_images)
+        im_files = glob.glob(dir_images + "/*.jpg")
+        feat_files = [dout + str(f).replace(input, "").replace(".jpg", ".csv") for f in im_files]
+        print("{} faces to extract features from.".format(len(feat_files)))
+        # import pdb
+        # pdb.set_trace()
+        nimages = len(im_files)
+        for i in range(nimages):
+            in_file = im_files[i]
+            f_file = feat_files[i]
+            if os.path.exists(f_file):
+                continue
+            print(f_file)
+            # layers = layers
+            # ofile = dout + str(ifile).replace(input, "").replace(".jpg", ".csv")
+            # if not io.mkdir(io.parent_dir(f_file)):
+                # continue
+                # continue
+            # if os.path.isfile(in_file):
 
-for ptype in types:
-    # each pair type
-    print("Processing image pairs of type {}".format(ptype))
-    # dir_images = []
-    dir_images = input + ptype + "/"
-    dirs_fid, fids = fiwdb.load_fids(dir_images)
-    im_files = glob.glob(input + "*/MID*/*.jpg")
-    feat_files = [dout + str(f).replace(input, "").replace(".jpg", ".csv") for f in im_files]
-    print("{} faces to extract features from.".format(len(feat_files)))
-    for in_file, f_file in zip(im_files[0], feat_files[0]):
-        # layers = layers
-        # ofile = dout + str(ifile).replace(input, "").replace(".jpg", ".csv")
-        if io.mkdir(in_file):
-            continue
-        # if os.path.isfile(in_file):
+            logger.info("Extracting feature for: {}\n".format(in_file))
+            fname = io.file_base(in_file)
 
-        logger.info("Extracting feature for: {}\n".format(in_file))
-        fname = io.file_base(in_file)
+            image = caffe_tools.load_prepare_resnet_centerloss(in_file, (112, 96))
+            # import pdb
+            # pdb.set_trace()
+            # my_net.net.blobs['data'].data[...] = image
+            output = my_net.net.forward()
 
-        image = caffe_tools.load_prepare_image_vgg(in_file)
-        my_net.net.blobs['data'].data[...] = image
-        output = my_net.net.forward()
+            # io.mkdir(io.filepath(in_file))
+            feat = my_net.net.blobs[l].data[0]
+            logger.info("Writing feature to disk: {}\n".format(f_file))
 
-        # io.mkdir(io.filepath(in_file))
-        feat = my_net.net.blobs[layer].data[0]
-        logger.info("Writing feature to disk: {}\n".format(f_file))
-        np.savetxt(f_file, feat.flatten(), delimiter=',')  # X is an array
+            np.savetxt(f_file, feat.flatten(), delimiter=',')  # X is an array
 
 
 #

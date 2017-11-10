@@ -10,11 +10,11 @@ import sklearn.preprocessing as skpreprocess
 from sklearn.decomposition import TruncatedSVD
 
 
-features = ['conv5_2', 'conv5_3', 'pool5', 'fc6', 'fc7']
-sub_dirs = ['father-dau', 'father-son',  'mother-dau', 'mother-son']
+features = ['fc5'] # ''conv5_2', 'conv5_3', 'pool5', 'fc6', 'fc7']
+sub_dirs = ['father-dau']#, 'father-son',  'mother-dau', 'mother-son']
 
 dir_root = '/media/jrobby/Seagate Backup Plus Drive1/DATA/Kinship/KinFaceW-II/'
-dir_features = dir_root + 'vgg_face/'
+dir_features = dir_root + '/features/fine-tuned/'
 
 dir_results = dir_features + 'results_spca/'
 io.mkdir(dir_results)
@@ -31,7 +31,7 @@ pair_types = [io.file_base(f) for f in f_lists]
 dir_feats = [dir_features + p + "/" for p in sub_dirs]
 
 fold_list = [1, 2, 3, 4, 5]
-for ids in [1]:
+for ids in fold_list:
     folds, labels, pairs1, pairs2 = kinwild.read_pair_list(f_lists[ids])
 
     d_out = dir_results + pair_types[ids] + "/"

@@ -8,7 +8,9 @@ import csv
 import matplotlib.image as mpimg
 import tempfile
 import urllib
-import urllib.request
+from skimage.transform import resize
+
+# import urllib.request
 
 __author__ = 'Joseph Robinson'
 
@@ -56,6 +58,7 @@ def saveimage(f_image, image):
 
     cv2.imwrite(f_image, image)
 
+
 def savelist(imdir, outfile):
     """Write out all images in a directory to a provided file with each line containing absolute path to image"""
     return io.writelist(list(imdir), outfile)
@@ -71,7 +74,28 @@ def read(img_file):
     return mpimg.imread(img_file)
 
 
+def reshape(img, im_dims, rgb=True):
+    """
+    Resize dimensions of image; else, preserve rgb channels by default, or set False to convert to gray then resize.
+
+    :param img:         image to resize :param im_dims:     dimension (h, w) to set img to :param rgb:
+    boolean flag to specify whether rgb should be returned. Note that if gray is passed, then function will convert
+    to RGB by copying single channel across 3 channels. :return:
+    """
+    import pdb
+    pdb.set_trace()
+    if rgb:
+        return resize(img.reshape, im_dims[0], im_dims[1], 3)
+    else:
+        return resize(rgb2bgr(img).reshape([im_dims[0], im_dims[1]]))
+
+
 def resize(img):
+    """
+
+    :param img:
+    :return:
+    """
     img = np.true_divide(img - np.amin(img), np.amax(img) - np.amin(img))
 
     return img
