@@ -7,12 +7,14 @@
 """
 from __future__ import print_function
 
+import scipy.misc
 import caffe
 import os
 from warnings import warn
 import numpy as np
 import pickle
 import common.utilities as utils
+import common.image as imutils
 import csv
 import scipy.io
 
@@ -200,6 +202,32 @@ def load_prepare_image_res(f_image, avg=np.array([122.782, 117.001, 104.298])):
 
     return img
 
+
+def load_prepare_resnet_centerloss(f_image, im_dims=[112, 96], avg=127.5):
+    """
+    Load and prepare image for VGG16 (i.e., VGGFace) Model.
+
+    :param f_image:    fpath to image to be processed
+    :param avg:     mean image (default set to that of VGGFace)
+    :return:        Loaded and preprocessed image
+    """
+    # rescale from [0, 1] to [0, 255] & convert RGB->BGR
+
+    img = load_image(f_image)
+
+    if img is None:
+        return None
+
+    img = img[:, :, ::-1] * 255.0  #
+    img = img - avg  # subtract mean (numpy takes care of dimensions :)
+    img /= 128.0
+    img = scipy.misc.imresize(img, (112, 96, 3))
+
+    # img = imutils.reshape(img, (96, 112))
+    img = img.transpose((2, 0, 1))
+    img = img[None, :]  # add singleton dimension
+
+    return img
 
 def load_prepare_image_vgg(f_image, avg=np.array([129.1863, 104.7624, 93.5940])):
     """
