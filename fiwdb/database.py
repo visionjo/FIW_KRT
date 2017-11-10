@@ -7,7 +7,7 @@ import glob
 import pandas as pd
 import numpy as np
 import common.image as imutils
-from urllib.error import URLError, HTTPError
+# from urllib.error import URLError, HTTPError
 import common.io as io
 import common.log as log
 from common.io import sys_home as dir_home
@@ -20,8 +20,9 @@ import csv
 logger = log.setup_custom_logger(__name__, f_log='fiwdb.log', level=log.INFO)
 logger.info('FIW-DB')
 
-dir_db = str(dir_home()) + "/Dropbox/Families_In_The_Wild/Database/"
-dir_fid_root = str(dir_home()) + "/Dropbox/Families_In_The_Wild/Database/journal_data/FIDs/"
+# dir_db = str(dir_home()) + "/Dropbox/Families_In_The_Wild/Database/"
+dir_db = "/data/"
+dir_fid_root = dir_db + "journal_data/FIDs/"
 
 
 def download_images(f_pid_csv=dir_db + "FIW_PIDs_new.csv", dir_out=dir_db + "fiwimages/"):
@@ -52,12 +53,12 @@ def download_images(f_pid_csv=dir_db + "FIW_PIDs_new.csv", dir_out=dir_db + "fiw
             logger.error("Error with {}\n{}\n".format(df_io['PIDs'][i], img_url))
             error_message = "<p>Error: %s</p>\n" % str(e0)
             logger.error(error_message)
-        except HTTPError as e1:
-            logger.error("The server couldn't fulfill the request.")
-            logger.error("Error code: ", e1.code)
-        except URLError as e2:
-            logger.error("Failed to reach a server.")
-            logger.error("Reason: ", e2.reason)
+        # except HTTPError as e1:
+        #     logger.error("The server couldn't fulfill the request.")
+        #     logger.error("Error code: ", e1.code)
+        # except URLError as e2:
+        #     logger.error("Failed to reach a server.")
+        #     logger.error("Reason: ", e2.reason)
 
 
 def get_unique_pairs(ids_in):
@@ -218,6 +219,8 @@ def folds_to_sets(f_csv=dir_db + 'journal_data/Pairs/folds_5splits/', dir_out=di
 
 
 def parsing_families(f_csv='mid.csv'):
+    import pdb
+    pdb.set_trace()
     fid_list = load_fids(dir_fid_root)[0]
     fid_list.sort()
     tup_mid = [(d[-6:-1], pd.read_csv(d + "/" + f_csv)) for d in fid_list]
@@ -255,12 +258,13 @@ def parsing_families(f_csv='mid.csv'):
         nrelationships = np.size(np.nonzero(votes[max_index,:]))
 
         # fam_list.append((zip(*df), max_index, max_value, nrelationships))
-        fam_list.append((*df, max_index, max_value, nrelationships))
+        # uz_df =
+        fam_list.append((zip(*df), max_index, max_value, nrelationships))
 
         mlist = ("MID" + str(int(mid)) for mid in mid_list if mid > 0)
 
         if nrelationships >= 3:
-            fam_list2.append([df[1], "MID" + str(1 + max_index), max_value, nrelationships, "MID" + str(1 + max_index2), max_value2, np.size(np.nonzero(votes[max_index2,:])), *mlist])
+            fam_list2.append([df[1], "MID" + str(1 + max_index), max_value, nrelationships, "MID" + str(1 + max_index2), max_value2, np.size(np.nonzero(votes[max_index2,:])), zip(*mlist)])
             tr_mids.append((df[1], mlist))
 
     ofile = open('ttest.csv', "w")
@@ -370,3 +374,6 @@ class Pair(object):
 
     def __lt__(self, other):
         return np.uint(self.fid[1::]) < np.uint(other.fid[1::])
+
+if __name__ == '__main__':
+    pass
