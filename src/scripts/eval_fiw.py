@@ -11,13 +11,13 @@ import pandas as pd
 import database.fiw as fiw
 
 layers = ['conv5_2', 'conv5_3', 'pool5', 'fc6', 'fc7']
+layers = ['res5a']
 # lid = 4
-layers = reversed(layers)
 # sub_dirs = ['father-dau', 'father-son',  'mother-dau', 'mother-son']
 
 dir_root = io.sys_home() + '/Dropbox/Families_In_The_Wild/Database/journal_data/'
-dir_features = '/media/jrobby/Seagate Backup Plus Drive1/FIW_dataset/FIW_Extended/feats/vgg_face/'
-dir_results = io.sys_home() + '/Dropbox/Families_In_The_Wild/Database/journal_results/verification/vgg_face/'
+dir_features = '/media/jrobby/Seagate Backup Plus Drive1/FIW_dataset/FIW_Extended/features/vgg_face/resnet/'
+dir_results = io.sys_home() + '/Dropbox/Families_In_The_Wild/Database/journal_results/verification/res_net/'
 io.mkdir(dir_results)
 
 dir_pairs = dir_root + "Pairs/folds_5splits/"
