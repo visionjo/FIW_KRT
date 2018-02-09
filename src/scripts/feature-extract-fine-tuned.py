@@ -3,15 +3,15 @@
 
 # TODO: PCA
 # TODO refactor code, such to enable interface for options, opposed to hard coded as done currently.
+from __future__ import print_function
 import numpy as np
 import glob
-import common.io as io
+import src.common.io as io
 
-import fiwdb.database as fiwdb
 import os
-import common.log as log
-import frameworks.pycaffe.net_wrapper as cw
-import frameworks.pycaffe.tools as caffe_tools
+import src.common.log as log
+import src.frameworks.pycaffe.net_wrapper as cw
+import src.frameworks.pycaffe.tools as caffe_tools
 
 
 logger = log.setup_custom_logger(__name__, f_log='kinwildW-feat-extractor.log', level=log.INFO)

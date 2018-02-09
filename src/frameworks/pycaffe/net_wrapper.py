@@ -5,7 +5,7 @@ import caffe
 import os
 import numpy as np
 import warnings
-import frameworks.pycaffe.tools as caffe_tools
+import src.frameworks.pycaffe.tools as caffe_tools
 
 
 class CaffeWrapper:

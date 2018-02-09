@@ -15,14 +15,14 @@
 #   The examples/faces folder contains some jpg images of people.  You can run
 #   this program on them and see the detections by executing the
 # TODO merge with other dlib face detection script-- add flag to save jpegs and csv
+from __future__ import print_function
 
-import sys
+import src.common.io as myio
 import dlib
 from skimage import io
 import glob
-import numpy as np
 import pandas as pd
-import common.io as myio
+
 
 print("DLIB's CNN FACE DETECTOR: START")
 dir_root = "Families_In_The_Wild/Database/"

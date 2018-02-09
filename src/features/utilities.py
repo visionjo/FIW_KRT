@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import sklearn.preprocessing as skpreprocess
 from scipy import linalg

@@ -3,14 +3,14 @@ Module of utilities for handling FIW DB.
 
 Methods to download PIDs using URL, load Anns and LUTs, along with metadata (e.g., gender, mids, pair lists).
 """
+from __future__ import print_function
+
 import glob
 import pandas as pd
 import numpy as np
-import common.image as imutils
-# from urllib.error import URLError, HTTPError
-import common.io as io
-import common.log as log
-from common.io import sys_home as dir_home
+import src.common.image as imutils
+import src.common.io as io
+import src.common.log as log
 import operator
 import csv
 

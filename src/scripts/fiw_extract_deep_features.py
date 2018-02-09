@@ -2,20 +2,16 @@
 # docker run -ti -v /home/jrobby/Dropbox/Families_In_The_Wild/Database/FIDs:/data -v /home/jrobby/Dropbox/Families_In_The_Wild/python/models:/models -v /media/jrobby/Seagate\ Backup\ Plus\ Drive1/FIW_dataset/FIW_Extended/feats:/feats -v /home/jrobby/Dropbox/github/FIW_KRT:/code  bvlc/caffe:gpu bash
 
 # TODO: PCA
+from __future__ import print_function
 import numpy as np
 import glob
-import common.utilities as utils
-import sklearn.metrics.pairwise as pw
-from sklearn.metrics import roc_curve, auc
-import common.io as io
-import fiwdb.database as fiwdb
-import sklearn.preprocessing as skpreprocess
-from sklearn.decomposition import TruncatedSVD
+import src.common.io as io
+import src.fiwdb.database as fiwdb
 import argparse
 import os
-import common.log as log
-import frameworks.pycaffe.net_wrapper as cw
-import frameworks.pycaffe.tools as caffe_tools
+import src.common.log as log
+import src.frameworks.pycaffe.net_wrapper as cw
+import src.frameworks.pycaffe.tools as caffe_tools
 
 
 logger = log.setup_custom_logger(__name__, f_log='fiw-feat-extractor.log', level=log.INFO)

@@ -2,9 +2,9 @@
 
 # Script to parse different pair types for kin verification.
 # TODO refactor
-import database.fiw as fiw
-import fiwdb.database as db
-import common.log as log
+import src.data.fiw as fiw
+import src.fiwdb.database as db
+import src.common.log as log
 
 logger = log.setup_custom_logger(__name__, f_log='fiw_error_new.log', level=log.INFO)
 
