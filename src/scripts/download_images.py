@@ -1,7 +1,8 @@
+from __future__ import print_function
 import pandas as pd
 import numpy as np
 import urllib.request
-import common.io as io
+import src.common.io as io
 import os
 f_csv = "/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIW_PIDs.csv"
 

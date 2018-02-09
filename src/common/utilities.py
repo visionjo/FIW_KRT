@@ -4,11 +4,9 @@ from __future__ import print_function
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-import common.io as io
+import src.common.io as io
 from configparser import ConfigParser, ExtendedInterpolation
 from collections import namedtuple
-from sklearn.preprocessing import StandardScaler
-
 import warnings as warn
 
 __author__ = 'Joseph Robinson'

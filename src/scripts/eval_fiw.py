@@ -1,14 +1,14 @@
 # This script evaluates features from the KinFaceW-(I/II) dataset
+from __future__ import print_function
 import numpy as np
-import features.utilities as futils
+import src.features.utilities as futils
 import glob
 import sklearn.metrics.pairwise as pw
 from sklearn.metrics import roc_curve, auc
-import common.io as io
-import database.kinwild as kinwild
+import src.common.io as io
+import src.database.kinwild as kinwild
 import sklearn.preprocessing as skpreprocess
 import pandas as pd
-import database.fiw as fiw
 
 layers = ['conv5_2', 'conv5_3', 'pool5', 'fc6', 'fc7']
 layers = ['res5a']

@@ -1,9 +1,10 @@
+from __future__ import print_function
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import os
-import common.io as io
-import common.utilities as utils
+import src.common.io as io
+import src.common.utilities as utils
 import csv
 import matplotlib.image as mpimg
 import tempfile

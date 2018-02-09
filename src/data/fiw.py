@@ -1,17 +1,18 @@
+from __future__ import print_function
 import glob
 import warnings as warn
 import numpy as np
 import pandas as pd
 import csv
 
-import common.io as io
-import fiwdb.database as db
-import fiwdb.helpers as helpers
-from fiwdb.database import load_fids
+import src.common.io as io
+import src.fiwdb.database as db
+import src.fiwdb.helpers as helpers
+from src.fiwdb.database import load_fids
 
 from collections import defaultdict
-import common.log as log
-from common.io import sys_home as dir_home
+import src.common.log as log
+from src.common.io import sys_home as dir_home
 
 logger = log.setup_custom_logger(__name__)
 logger.debug('Parse FIW')

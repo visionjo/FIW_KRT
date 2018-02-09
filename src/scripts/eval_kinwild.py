@@ -1,11 +1,12 @@
 # This script evaluates features from various layers of VGG of the faces from KinFaceW-(I/II) dataset
 # TODO: make script with command line arguments (i.e., argparse)
+from __future__ import print_function
 import numpy as np
 import glob
 import sklearn.metrics.pairwise as pw
 from sklearn.metrics import roc_curve, auc
-import common.io as io
-import database.kinwild as kinwild
+import src.common.io as io
+import src.data.kinwild as kinwild
 import sklearn.preprocessing as skpreprocess
 from sklearn.decomposition import TruncatedSVD
 
