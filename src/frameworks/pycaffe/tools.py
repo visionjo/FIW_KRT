@@ -14,7 +14,6 @@ from warnings import warn
 import numpy as np
 import pickle
 import src.common.utilities as utils
-import src.common.image as imutils
 import csv
 import scipy.io
 
