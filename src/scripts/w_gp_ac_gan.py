@@ -117,7 +117,7 @@ def w_gp_ac_gan(cmd):
 
     # See if use W-GAN
     if wgan == 1:
-        ## Gradient Panelty
+        # Gradient Panelty
         alpha = tf.random_uniform(shape=[BATCH_SIZE, 1], minval=0., maxval=1.)
         differences = G_sample - X
         interpolates = X + (alpha * differences)
