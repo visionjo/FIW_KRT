@@ -11,10 +11,10 @@ with open('LICENSE') as f:
 
 setup(
     name='FIW_KRT',
-    version='0.1.0',
+    version='1.0.0',
     description='Families In the WIld: A Kinship Recogntion Toolbox.',
     long_description=readme,
-    author='Kenneth Reitz',
+    author='Joseph Robinson',
     author_email='robinson.jo@husky.neu.edu',
     url='https://github.com/huskyjo/FIW_KRT',
     license=license,
