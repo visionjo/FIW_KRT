@@ -1,6 +1,6 @@
 from __future__ import print_function
 import numpy as np
-import cv2
+# import cv2
 import matplotlib.pyplot as plt
 import os
 import src.common.io as io

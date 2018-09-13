@@ -1,23 +1,24 @@
-# FIW_KRT
+# FIW API
 Families In the WIld: A Kinship Recogntion Toolbox.
-**Version 0.1**
+**Version 1.0**
 
-[//]: This document is incomplete, i.e., work in progress, as is the API codebase itself.
+This document is incomplete, i.e., work in progress, as is the API itself.
 
-[![N|Solid](http://smile-fiw.weebly.com/uploads/4/5/1/8/45182585/logo-fiw_orig.png)](http://smile-fiw.weebly.com/uploads/4/5/1/8/45182585/logo-fiw_orig.png)
-Overview
+[![N|Solid](reports/teaser_image.jpg)](reports/teaser_image.jpg)
 ------------
+## Overview
+
 This API serves as the main code-base for kinship effort with FIW database. 
 
 
 
 Tools for FIW as sample for term project.
 
-Project Organization
 ------------
+## Project Organization
+
 
     ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
     ├── README.md          <- The top-level README for developers using this project.
     ├── data
     │   ├── external       <- Data from third party sources.
@@ -58,12 +59,12 @@ Project Organization
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
     │       └── visualize.py
     │
-    └── tox.ini            <- tox file with settings for running tox; see tox.testrun.org
+    └── <OPEN>             <- TBD
 
 
 --------
 
-
+------------
 ## Installation
 
 
@@ -86,5 +87,3 @@ Project Organization
    
 ## Authors
 * **Joseph Robinson** - [Github](https://github.com/huskyjo) - [web](http://www.jrobsvision.com)
-
-<a name="myfootnote1">1</a>: footie.
