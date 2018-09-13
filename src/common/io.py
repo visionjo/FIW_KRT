@@ -3,6 +3,8 @@ import os
 import string
 import scipy.io as scio
 import numpy as np
+from .utilities import is_numpy
+
 
 def csv_list(imdir):
     """Return a list of absolute paths of *.csv files in current directory"""
@@ -157,6 +159,7 @@ def filepath(filename):
     (head, tail) = os.path.split(filename)
     return head
 
+
 def newpath(filename, newdir):
     """Return /a/b for filename /a/b/c.ext"""
     (head, tail) = os.path.split(filename)
@@ -166,7 +169,7 @@ def newpath(filename, newdir):
 def videolist(videodir):
     """return list of images with absolute path in a directory"""
     return [os.path.abspath(os.path.join(videodir, item)) for item in os.listdir(videodir) if
-            (IO.is_video(item) and not IO.is_hidden_file(item))]
+            (is_video(item) and not is_hidden_file(item))]
 
 
 def writecsv(list_of_tuples, outfile, mode='w', separator=','):
@@ -180,7 +183,7 @@ def writecsv(list_of_tuples, outfile, mode='w', separator=','):
                     f.write(str(v) + separator)
                 else:
                     f.write(str(v) + '\n')
-    return (outfile)
+    return outfile
 
 
 def writelist(mylist, outfile, mode='w'):

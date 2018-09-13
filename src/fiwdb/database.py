@@ -42,8 +42,6 @@ def download_images(f_pid_csv=dir_db + "FIW_PIDs_new.csv", dir_out=dir_db + "fiw
     logger.info("{} photos to download".format(int(df_io.count().mean())))
 
     for i, img_url in enumerate(df_io['URL']):
-        if i == 100:
-            return
         try:
             f_out = str(dir_out) + df_io['FIDs'][i] + "/" + df_io['PIDs'][i] + ".jpg"
             img = imutils.url_to_image(img_url)
@@ -53,12 +51,6 @@ def download_images(f_pid_csv=dir_db + "FIW_PIDs_new.csv", dir_out=dir_db + "fiw
             logger.error("Error with {}\n{}\n".format(df_io['PIDs'][i], img_url))
             error_message = "<p>Error: %s</p>\n" % str(e0)
             logger.error(error_message)
-        # except HTTPError as e1:
-        #     logger.error("The server couldn't fulfill the request.")
-        #     logger.error("Error code: ", e1.code)
-        # except URLError as e2:
-        #     logger.error("Failed to reach a server.")
-        #     logger.error("Reason: ", e2.reason)
 
 
 def get_unique_pairs(ids_in):
@@ -292,7 +284,6 @@ def parsing_families(f_csv='mid.csv'):
         for ttt in list(tt[7:]):
             tr_list.append(glob.glob(dir_fid_root + tt[0] + "/" + ttt + "/*.jpg"))
 
-
     with open('test_no_labels.list', 'w') as f:
         for _list in te_list:
             if len(_list) == 0:
@@ -324,7 +315,7 @@ def parsing_families(f_csv='mid.csv'):
                 # # f.seek(0)
                 # f.write(str(_string) + '\n')
 
-    ofile  = open('test.;', "w")
+    # ofile  = open('test.;', "w")
 class Pairs(object):
     def __init__(self, pair_list, kind=''):
         self.df_pairs = Pairs.list2table(pair_list)

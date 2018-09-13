@@ -1,3 +1,4 @@
+Pillow
 scipy
 scikit-learn
 six
