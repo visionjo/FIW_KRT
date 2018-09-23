@@ -1,5 +1,8 @@
 # FIW API
-Families In the WIld: A Kinship Recogntion Toolbox.
+Families In the WIld: A Kinship Recogntion Toolbox. Visit FIW project page to download and learn more! 
+
+[https://web.northeastern.edu/smilelab/fiw/](https://web.northeastern.edu/smilelab/fiw/)
+
 **Version 1.0**
 
 This document is incomplete, i.e., work in progress, as is the API itself.
