@@ -20,9 +20,10 @@ import csv
 logger = log.setup_custom_logger(__name__, f_log='fiwdb.log', level=log.INFO)
 logger.info('FIW-DB')
 
-# dir_db = str(dir_home()) + "/Dropbox/Families_In_The_Wild/Database/"
-dir_db = "/data/"
-dir_fid_root = dir_db + "journal_data/FIDs/"
+dir_db = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/"
+# dir_db = "/data/"
+dir_fid_root = dir_db + "FIDs_NEW/"
+# dir_fid_root = dir_db + "journal_data/FIDs/"
 
 
 def download_images(f_pid_csv=dir_db + "FIW_PIDs_new.csv", dir_out=dir_db + "fiwimages/"):
@@ -115,7 +116,7 @@ def load_mids(dirs_fid, f_csv='mid.csv'):
     return [pd.read_csv(d + "/" + f_csv) for d in dirs_fid]
 
 
-def load_relationship_matrices(dirs_fid=dir_fid_root, f_csv='relationships.csv'):
+def load_relationship_matrices(dirs_fid=dir_fid_root, f_csv='mid.csv'):
     """
     Load CSV file containing member information, i.e., {MID : ID, Name, Gender}
     :type f_csv:        file name of CSV files containing member labels
@@ -133,7 +134,38 @@ def load_relationship_matrices(dirs_fid=dir_fid_root, f_csv='relationships.csv')
 
     return df_relationships
 
+def get_relationship_dictionaries(dir_fid,fids, f_csv='mid.csv'):
+    """
+    Load CSV file containing member information, i.e., {MID : ID, Name, Gender}
+    :type f_csv:        file name of CSV files containing member labels
+    :param dirs_fid:    root folder containing FID/MID/ folders of DB.
 
+    :return:
+    """
+
+    dict_relationships = {}
+    for i, fid in enumerate(fids):
+        df_relationships = pd.read_csv(dir_fid + '/' + fid + '/' + f_csv)
+        df_relationships.index = range(1, len(df_relationships) + 1)
+        df_relationships = df_relationships.ix[:, 1:len(df_relationships) + 1]
+        dict_relationships[fid] = df_relationships
+    return dict_relationships
+
+def get_names_dictionaries(dir_fid,fids, f_csv='mid.csv'):
+    """
+    Load CSV file containing member information, i.e., {MID : ID, Name, Gender}
+    :type f_csv:        file name of CSV files containing member labels
+    :param dirs_fid:    root folder containing FID/MID/ folders of DB.
+
+    :return:
+    """
+
+    dict_names = {}
+    for i, fid in enumerate(fids):
+        df_relationships = pd.read_csv(dir_fid + '/' + fid + '/' + f_csv)
+        dict_names[fid] = list(df_relationships['Name'])
+
+    return dict_names
 def parse_relationship_matrices(df_mid):
     """
     Parses out relationship matrix from MID dataframe.
