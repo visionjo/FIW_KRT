@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import csv
 
-import src.common.io as io
+from src.common import io
 import src.fiwdb.database as db
 import src.fiwdb.helpers as helpers
 from src.fiwdb.database import load_fids
@@ -13,6 +13,7 @@ from src.fiwdb.database import load_fids
 from collections import defaultdict
 import src.common.log as log
 from src.common.io import sys_home as dir_home
+from src.data import fiw
 
 logger = log.setup_custom_logger(__name__)
 logger.debug('Parse FIW')
@@ -88,8 +89,7 @@ class Family(object):
         """
         pass
 
-
-def load_families(dir_fids, f_rel_matrix='relationships.csv', f_mids='mids.csv'):
+def load_families(dir_fids, f_mids='mid.csv'):
     """
 
     :param dir_fids: root folder containing FID/MID/ folders of DB.
@@ -106,7 +106,7 @@ def load_families(dir_fids, f_rel_matrix='relationships.csv', f_mids='mids.csv')
     print("{} families are being processed".format(len(df_mids)))
 
     # Load relationship matrices for all FIDs.
-    relationship_matrices = db.load_relationship_matrices(dirs_fid, f_csv=f_rel_matrix)
+    relationship_matrices = db.load_relationship_matrices(dirs_fid, f_csv=f_mids)
 
     fams = []
     for i, mids in enumerate(df_mids):
@@ -603,6 +603,12 @@ if __name__ == '__main__':
     out_bin =  dir_home() + "/Dropbox/Families_In_The_Wild/Database/Pairs/"
     dir_fids = dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIDs/"
     dir_fid = dir_home() + "/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
+
+    dir_families = '/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIDs_NEW/'
+
+
+    fams = fiw.load_families(dir_families)
+    exit(0)
     logger.info("Output Bin: {}\nFID folder: {}\n Anns folder: {}".format(out_bin, dir_fids, dir_fid))
 
     do_sibs = False
