@@ -1,0 +1,16 @@
+python main.py --finetune
+  Fine-tuning pretrained model at model/sphere20a_20171020.pth
+  start: time=23:26:38
+  Begin train
+  23:26:52 Te=0 Loss=4.0235 | AccT=37.0000% (3818/10255) 2.8904 23.04 641
+  23:27:07 Te=1 Loss=2.3342 | AccT=78.0000% (8096/10255) 3.3873 11.61 1282
+  23:27:21 Te=2 Loss=1.4440 | AccT=92.0000% (9518/10255) 1.6491 7.76 1923
+  Begin validation
+  PTYPE=bb TPR=0.6607 FPR=0.2713 ACC=0.6857 std=0.0267 thd=0.1220
+  PTYPE=fd TPR=0.5173 FPR=0.3568 ACC=0.5333 std=0.0754 thd=0.0530
+  PTYPE=fs TPR=0.5478 FPR=0.2196 ACC=0.6929 std=0.1403 thd=0.1220
+  PTYPE=md TPR=0.7289 FPR=0.1316 ACC=0.7712 std=0.0767 thd=0.1000
+  PTYPE=ms TPR=0.5611 FPR=0.3044 ACC=0.6301 std=0.0853 thd=0.0920
+  PTYPE=sibs TPR=0.7793 FPR=0.1819 ACC=0.7936 std=0.0789 thd=0.0780
+  PTYPE=ss TPR=0.8143 FPR=0.1867 ACC=0.8091 std=0.0880 thd=0.1030
+  finish: time=23:30:37
