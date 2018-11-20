@@ -35,7 +35,8 @@ class FIW_Train(data.Dataset):
     def __getitem__(self, index):
         """Return an image"""
         filename, label = self.train_dataset[index]
-        image = Image.open(os.path.join(self.root_dir, filename))
+        impath = os.path.join(self.root_dir, filename)
+        image = Image.open(impath)
         return self.transform(image), label
 
     def __len__(self):
