@@ -11,12 +11,10 @@ import datetime
 import math
 import argparse
 import numpy as np
-
+from torchtools import TorchTools, Tensor, cuda
 import net_sphere
 from data_loader import get_train_loader, get_val_loader
 
-cuda = torch.cuda.is_available()
-Tensor = torch.FloatTensor if not cuda else torch.cuda.FloatTensor
 
 ptypes = ['bb', 'fd', 'fs', 'md', 'ms', 'sibs', 'ss']  # FIW pair types
 csv_base_path = 'pairs/{}_val.csv'
@@ -82,11 +80,14 @@ def find_best_threshold(thresholds, predicts):
     return best_threshold
 
 
-def validate(base_dir='val'):
+def validate(net, base_dir='val'):
     print('Begin validation')
 
     net.eval()
-    for ptype in ptypes:
+    accuracy = []
+    for i, ptype in enumerate(ptypes):
+        if i > 0:
+            return np.mean(accuracy)
         csv_path = os.path.join(base_dir, csv_base_path.format(ptype))
 
         loader = get_val_loader(base_dir, csv_path)
@@ -121,7 +122,7 @@ def validate(base_dir='val'):
             tpr, fpr, acc = eval_acc(best_thresh, dists[test])
             tprs += [tpr]
             fprs += [fpr]
-            accuracy += acc
+            accuracy += [acc]
             thd.append(best_thresh)
         # Compute ROC curve and ROC area for each class
         # fpr = dict()
@@ -139,7 +140,8 @@ def validate(base_dir='val'):
                                                                                        np.mean(thd)))
 
 
-def train(epoch, loader, args):
+
+def train(net, optimizer, epoch, loader):
     net.train()
     train_loss = 0
     correct = 0
@@ -153,11 +155,12 @@ def train(epoch, loader, args):
         inputs, targets = Variable(inputs), Variable(targets)
         outputs, _ = net(inputs)
         loss = criterion(outputs, targets)
-        lossd = loss.data[0]
+
         loss.backward()
         optimizer.step()
-
-        train_loss += loss.data[0]
+        lossd = loss.data[0]
+        del loss
+        train_loss += lossd
         outputs = outputs[0]  # 0=cos_theta 1=phi_theta
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
@@ -175,13 +178,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='FIW Sphereface Baseline')
     parser.add_argument('--net', '-n', default='sphere20a', type=str)
     parser.add_argument('--lr', default=0.01, type=float, help='inital learning rate')
-    parser.add_argument('--n_epochs', default=3, type=int, help='number of training epochs')
-    parser.add_argument('--batch_size', default=16, type=int, help='training batch size')
-    parser.add_argument('--no_train', action='store_true', help='set to not train')
+    parser.add_argument('--n_epochs', default=10, type=int, help='number of training epochs')
+    parser.add_argument('--batch_size', default=64, type=int, help='training batch size')
+    parser.add_argument('--train', action='store_true', help='set to not train')
     parser.add_argument('--finetune', action='store_true', help='set to fine-tune the pretrained model')
     parser.add_argument('--pretrained', default='model/sphere20a_20171020.7z', type=str,
                         help='the pretrained model to point to')
-    parser.add_argument('--data_dir', '-d', type=str, default='/Users/josephrobinson/datasets/FIW/RFIW/',
+    parser.add_argument('--data_dir', '-d', type=str, default='/home/jrobby/datasets/FIW/RFIW/',
                         help='Root directory of data (assumed to contain traindata and valdata)')
 
 
@@ -208,21 +211,33 @@ if __name__ == "__main__":
     criterion = net_sphere.AngleLoss()
     # train_dir = '/Users/josephrobinson/Downloads/'
     train_dir = args.data_dir + '/train/'
-    val_dir = args.data_dir + 'val/'
+    val_dir = args.data_dir + '/val/'
     # 'train'
     train_loader = get_train_loader(train_dir, batch_size=args.batch_size)
 
     print('start: time={}'.format(dt()))
-    if not args.no_train:
+    # optimizer = optim.Adam(net.parameters(), lr=args.lr)
+    best_acc =0
+    if not args.train:
         print('Begin train')
         for epoch in range(args.n_epochs):
-            if epoch in [0]:
+            if epoch in [0, 2, 4, 6, 8]:
                 if epoch != 0: args.lr *= 0.1  # hardcoded for now (n_epochs = 3)
                 params = [x for x in net.parameters() if x.requires_grad]
                 optimizer = optim.SGD(params, lr=args.lr, momentum=0.9, weight_decay=5e-4)
-            train(epoch, train_loader, args)
-            save_model(net, '{}_{}.pth'.format(args.net, epoch))
+            train(net, optimizer, epoch, train_loader)
+            acc = validate(net, val_dir)
 
-    validate(val_dir)
+            TorchTools.save_checkpoint({'epoch': epoch + 1,
+                                        'state_dict': net.state_dict(),
+                                        'optimizer': optimizer.state_dict(),
+                                        'best_acc': acc}, is_best=acc < best_acc,
+                                       checkpoint_dir='/home/jrobby/FIW_KRT/sphereface_rfiw_baseline/finetuned/')
+
+            best_acc = acc if acc > best_acc else best_acc
+
+            # if best_acc < acc:
+            #     save_model(net, '{}_{}.pth'.format(args.net, epoch))
+            #     best_acc = acc
 
     print('finish: time={}\n'.format(dt()))
