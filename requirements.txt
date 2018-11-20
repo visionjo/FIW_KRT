@@ -1,3 +1,7 @@
+dlib
+torchvision
+matplotlib
+torch
 Pillow
 scipy
 scikit-learn
