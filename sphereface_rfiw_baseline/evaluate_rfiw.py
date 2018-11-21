@@ -57,13 +57,12 @@ def validate(net, data_loader):
     net.eval()
     dists = []
     y_labels = []
-    # nbatches = len(data_loader)
     distances = []
     for pairs, labels in iter(data_loader):
+
         # using nets to extract features from pairs and comparing (scoring using cosine distance)
         img_a = Variable(pairs[0]).type(Tensor)
         img_b = Variable(pairs[1]).type(Tensor)
-        # img_b = Tensor(pairs[1])
 
         _, embs_a = net(img_a)
         _, embs_b = net(img_b)
@@ -73,9 +72,6 @@ def validate(net, data_loader):
         cos_dis = torch.nn.functional.cosine_similarity(embs_a, embs_b)
         distances += list(cos_dis.data.cpu().numpy())
 
-        # for i in range(len(embs_a)):
-        #     cos_dis = embs_a[i].dot(embs_b[i]) / (embs_a[i].norm() * embs_b[i].norm() + 1e-5)
-        #     dists.append([cos_dis, int(labels[i])])
         y_labels += list(labels.numpy())
 
     dist_array = np.array(distances)
@@ -85,13 +81,11 @@ def validate(net, data_loader):
     fprs = []
     accuracy = []
     thd = []
-
     acc_best = 0
     folds = KFold(n=len(loader), n_folds=5, shuffle=False)
     aucs = []
 
-
-    thresh = np.arange(-1.0, 1.0, 0.005)
+    # thresh = np.arange(-1.0, 1.0, 0.005)
     mean_fpr = np.linspace(0, 1, 100)
     i=0
     for idx, (train, test) in enumerate(folds):
@@ -125,8 +119,6 @@ def validate(net, data_loader):
     plt.legend(loc="lower right")
     plt.show()
 
-
-
     fpr, tpr, thresh = roc_curve(y_array, dist_array)
     roc_auc = auc(fpr, tpr)
 
@@ -140,7 +132,6 @@ def validate(net, data_loader):
     fpr2, tpr2, _ = roc_curve(y_array.ravel(), dist_array.ravel())
     roc_auc2 = auc(fpr2, tpr2)
 
-
     plt.plot(fpr2, tpr2, color='darkorange',
              lw=lw, label='ROC curve (area = %0.2f)' % roc_auc2)
 
@@ -152,7 +143,6 @@ def validate(net, data_loader):
     plt.title('Receiver operating characteristic example')
     plt.legend(loc="lower right")
     plt.show()
-
 
     # best_thresh = find_best_threshold(thresh, dists[train])
     # tpr, fpr, acc = eval_acc(best_thresh, dists[test])
@@ -168,14 +158,6 @@ def validate(net, data_loader):
     #                                                                       np.mean(accuracy),
     #                                                                       np.std(accuracy),
     #                                                           np.mean(thd)))
-    # acc_best = acc is acc > acc_best el
-    # Compute ROC curve and ROC area for each class
-    # fpr = dict()
-    # tpr = dict()
-    # roc_auc = dict()
-    # for i in range(n_classes):
-    #     fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
-    #     roc_auc[i] = auc(fpr[i], tpr[i])
 
     return acc_best
 
