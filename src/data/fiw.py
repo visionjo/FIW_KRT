@@ -5,14 +5,14 @@ import numpy as np
 import pandas as pd
 import csv
 
-from src.common import io
-import src.fiwdb.database as db
-import src.fiwdb.helpers as helpers
-from src.fiwdb.database import load_fids
+from fiwtools.utils import io
+import fiwtools.fiwdb.database as db
+import fiwtools.fiwdb.helpers as helpers
+from fiwtools.fiwdb import load_fids
 
 from collections import defaultdict
-import src.common.log as log
-from src.common.io import sys_home as dir_home
+import fiwtools.utils.log as log
+from fiwtools.utils import sys_home as dir_home
 from src.data import fiw
 
 logger = log.setup_custom_logger(__name__)

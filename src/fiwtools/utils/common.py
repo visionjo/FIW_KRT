@@ -12,23 +12,6 @@ import warnings as warn
 __author__ = 'Joseph Robinson'
 
 
-def check_paths(*paths):
-    """
-    Function that checks variable number of files (i.e., unordered arguments, *paths). If any of the files do not exist '
-    then function fails (i.e., no info about failed indices, but just pass (True) or fail (False))
-
-    :param paths:   unordered args, each pointing to file.
-    :return:
-    """
-    do_exist = True
-    for x, path in enumerate(paths):
-        if not os.path.isfile(path):
-            warn.warn(str(x) + ") File not found: " + path)
-            do_exist = False
-
-    return do_exist
-
-
 def is_linux():
     """is the current platform Linux?"""
     (sysname, nodename, release, version, machine) = os.uname()
@@ -134,38 +117,6 @@ def show(img_display, img, lmarks, frontal_raw, face_proj, background_proj, temp
     __ = input("Press [enter] to continue.")
     plt.clf()
 
-
-def txtlist(imdir):
-    """Return a list of absolute paths of *.txt files in current directory"""
-    return [os.path.join(imdir, item) for item in os.listdir(imdir) if io.is_text_file(item) and not io.is_hidden_file(item)]
-
-
-def videolist(videodir):
-    """return list of images with absolute path in a directory"""
-    return [os.path.abspath(os.path.join(videodir, item)) for item in os.listdir(videodir) if
-            (io.is_video(item) and not io.is_hidden_file(item))]
-
-
-def writecsv(list_of_tuples, outfile, mode='w', separator=','):
-    """Write list of tuples to output csv file with each list element on a row and tuple elements separated by comma"""
-    list_of_tuples = list_of_tuples if not is_numpy(list_of_tuples) else list_of_tuples.tolist()
-    with open(outfile, mode) as f:
-        for u in list_of_tuples:
-            n = len(u)
-            for (k, v) in enumerate(u):
-                if (k + 1) < n:
-                    f.write(str(v) + separator)
-                else:
-                    f.write(str(v) + '\n')
-    return (outfile)
-
-
-def writelist(mylist, outfile, mode='w'):
-    """Write list of strings to an output file with each row an element of the list"""
-    with open(outfile, mode) as f:
-        for s in mylist:
-            f.write(str(s) + '\n')
-    return (outfile)
 
 
 class Configurations:

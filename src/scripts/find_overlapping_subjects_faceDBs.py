@@ -3,8 +3,8 @@ from collections import defaultdict
 import pandas as pd
 import numpy as np
 import re
-from src.common import io
-from src.fiwdb import database as db
+from fiwtools.utils import io
+from fiwtools.fiwdb import database as db
 
 def read_mscelebnames(f_names):
     names = io.readtxt(f_names)

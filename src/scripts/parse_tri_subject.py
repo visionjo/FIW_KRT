@@ -1,11 +1,11 @@
 from __future__ import print_function
-import src.common.io as io
+import fiwtools.utils.io as io
 import glob
 import pandas as pd
 import src.data.fiw as fiw
-import src.common.log as log
+import fiwtools.utils.log as log
 import numpy as np
-
+from fiwtools.utils.io import mkdir
 
 def combine_face_pairs(dirs_fid, tri_pairs, header=('p1', 'p2', 'p3')):
     """ Assumed tuple of 3 MIDs. All combinations of face pairs are generated and returned as DF
@@ -36,8 +36,10 @@ def combine_face_pairs(dirs_fid, tri_pairs, header=('p1', 'p2', 'p3')):
 
 logger = log.setup_custom_logger(__name__, f_log='tri-info.log', level=log.INFO)
 
-out_bin = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/Pairs/"
-dir_fids = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/FIDs/"
+out_bin = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/tripairs//"
+mkdir(out_bin)
+dir_fids = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/FIDs_New/"
+
 
 
 do_save = False

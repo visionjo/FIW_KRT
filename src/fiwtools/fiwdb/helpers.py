@@ -1,6 +1,6 @@
-import src.fiwdb.database as db
+import fiwtools.fiwdb.database as db
 import numpy as np
-import src.common.log as log
+import fiwtools.utils.log as log
 logger = log.setup_custom_logger(__name__)
 logger.debug('Parse FIW')
 

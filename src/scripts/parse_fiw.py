@@ -3,12 +3,11 @@
 # Script to parse different pair types for kin verification.
 # TODO refactor
 import src.data.fiw as fiw
-import src.fiwdb.database as db
-import src.common.log as log
+import fiwtools.fiwdb.database as db
+import fiwtools.utils.log as log
 
 logger = log.setup_custom_logger(__name__, f_log='fiw_error_new.log', level=log.INFO)
 
-import logging
 # def parse(dir_fids, kind, message="", do_save=False, file_prefix=""):
 #     """
 #       Function to find pairs for specific type, load and return all face pairs.
@@ -22,7 +21,7 @@ import logging
 #     """
 
 # log = logging.getLogger(__name__)
-import common.io as io
+from fiwtools import utils as io
 
 out_bin = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/journal_data/Pairs/"
 
