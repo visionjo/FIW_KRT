@@ -13,7 +13,7 @@ from skimage import io
 import glob
 import numpy as np
 import pandas as pd
-import src.common.io as myio
+import fiwtools.utils.io as myio
 
 print("DLIB CNN FACE DETECTOR: START")
 

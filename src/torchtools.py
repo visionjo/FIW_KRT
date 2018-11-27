@@ -1,13 +1,8 @@
-import glob
 import os
-from collections import defaultdict
 
-import PIL
-import cv2
 import numpy as np
 import torch
-from torch.autograd import Variable
-from common.io import is_file, file_base, mkdir
+from fiwtools.utils import is_file, mkdir
 
 import shutil
 cuda = True if torch.cuda.is_available() else False

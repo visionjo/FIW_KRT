@@ -7,8 +7,7 @@ from data_loader import get_val_loader
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
 from torch.autograd import Variable
-from common.io import sys_home
-import torch
+from fiwtools.utils.io import sys_home
 import torch.nn.functional as F
 do_plot = True
 

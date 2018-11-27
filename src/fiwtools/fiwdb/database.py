@@ -8,9 +8,9 @@ from __future__ import print_function
 import glob
 import pandas as pd
 import numpy as np
-import src.common.image as imutils
-import src.common.io as io
-import src.common.log as log
+import fiwtools.utils.image as imutils
+import fiwtools.utils.io as io
+import fiwtools.utils.log as log
 import operator
 import csv
 

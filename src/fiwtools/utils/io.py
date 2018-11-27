@@ -1,6 +1,10 @@
 from __future__ import print_function
+
+import io
 import os
 import string
+import warnings as warn
+
 import scipy.io as scio
 import numpy as np
 from .utilities import is_numpy
@@ -192,3 +196,25 @@ def writelist(mylist, outfile, mode='w'):
         for s in mylist:
             f.write(str(s) + '\n')
     return (outfile)
+
+
+def txtlist(imdir):
+    """Return a list of absolute paths of *.txt files in current directory"""
+    return [os.path.join(imdir, item) for item in os.listdir(imdir) if io.is_text_file(item) and not io.is_hidden_file(item)]
+
+
+def check_paths(*paths):
+    """
+    Function that checks variable number of files (i.e., unordered arguments, *paths). If any of the files do not exist '
+    then function fails (i.e., no info about failed indices, but just pass (True) or fail (False))
+
+    :param paths:   unordered args, each pointing to file.
+    :return:
+    """
+    do_exist = True
+    for x, path in enumerate(paths):
+        if not os.path.isfile(path):
+            warn.warn(str(x) + ") File not found: " + path)
+            do_exist = False
+
+    return do_exist

@@ -17,7 +17,7 @@
 # TODO merge with other dlib face detection script-- add flag to save jpegs and csv
 from __future__ import print_function
 
-import src.common.io as myio
+import fiwtools.utils.io as myio
 import dlib
 from skimage import io
 import glob
