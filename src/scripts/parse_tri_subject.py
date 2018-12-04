@@ -2,7 +2,7 @@ from __future__ import print_function
 import fiwtools.utils.io as io
 import glob
 import pandas as pd
-import src.data.fiw as fiw
+import fiwtools.data.fiw as fiw
 import fiwtools.utils.log as log
 import numpy as np
 from fiwtools.utils.io import mkdir

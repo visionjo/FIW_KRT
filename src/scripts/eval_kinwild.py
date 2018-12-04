@@ -6,7 +6,7 @@ import glob
 import sklearn.metrics.pairwise as pw
 from sklearn.metrics import roc_curve, auc
 import fiwtools.utils.io as io
-import src.data.kinwild as kinwild
+import fiwtools.data.kinwild as kinwild
 import sklearn.preprocessing as skpreprocess
 from sklearn.decomposition import TruncatedSVD
 
