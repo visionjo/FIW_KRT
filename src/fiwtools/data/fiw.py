@@ -13,7 +13,7 @@ from fiwtools.fiwdb import load_fids
 from collections import defaultdict
 import fiwtools.utils.log as log
 from fiwtools.utils import sys_home as dir_home
-from src.data import fiw
+from fiwtools.data import fiw
 
 logger = log.setup_custom_logger(__name__)
 logger.debug('Parse FIW')

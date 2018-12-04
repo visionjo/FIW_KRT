@@ -1,5 +1,5 @@
 from six.moves import xrange  # pylint: disable=redefined-builtin
-import src.data.preprocessing as dp
+import fiwtools.data.preprocessing as dp
 import tensorflow as tf
 import argparse
 import numpy as np
