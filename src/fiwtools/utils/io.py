@@ -7,7 +7,7 @@ import warnings as warn
 
 import scipy.io as scio
 import numpy as np
-from .utilities import is_numpy
+from .common import is_numpy
 
 
 def csv_list(imdir):
