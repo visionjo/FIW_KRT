@@ -12,7 +12,6 @@ import dlib
 from skimage import io
 
 import glob
-import numpy as np
 import pandas as pd
 import fiwtools.utils.io as myio
 import argparse
@@ -54,17 +53,6 @@ if __name__ == '__main__':
     npids = len(pids)
     print("Processing {} images".format(npids))
 
-    # images = [io.imread(f) for f in f_pids]
-
-    # '''
-    # Detector returns a mmod_rectangles object containing a list of mmod_rectangle objects, which are accessed by
-    #  iterating over the mmod_rectangles object. mmod_rectangle has 2 members, dlib.rectangle object & confidence score.
-    #
-    # It is possible to pass a list of images to the detector.
-    #     - like this: dets = cnn_face_detector([image list], upsample_num, batch_size = 128)
-    # In this case it will return a mmod_rectangless object.
-    # This object behaves just like a list of lists and can be iterated over.
-    # '''
     # Second argument indicates that we should upsample the image 1 time (i.e., bigger image to detect of more faces).
     dets = [cnn_face_detector(io.imread(f), 1) for f in f_pids]
 
