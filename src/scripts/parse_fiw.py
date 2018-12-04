@@ -2,7 +2,7 @@
 
 # Script to parse different pair types for kin verification.
 # TODO refactor
-import src.data.fiw as fiw
+import fiwtools.data.fiw as fiw
 import fiwtools.fiwdb.database as db
 import fiwtools.utils.log as log
 
