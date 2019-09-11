@@ -1,25 +1,28 @@
 # This script evaluates features from the KinFaceW-(I/II) dataset
 from __future__ import print_function
 import numpy as np
-import src.features.utilities as futils
+from src.fiwtools.utils import features as futils
 import glob
 import sklearn.metrics.pairwise as pw
 from sklearn.metrics import roc_curve, auc
-import fiwtools.utils.io as io
+import src.fiwtools.utils.io as io
 
 # from src.common.utilities import *
-import src.database.kinwild as kinwild
+import src.fiwtools.kinwild as kinwild
 import sklearn.preprocessing as skpreprocess
 import pandas as pd
+
+
+from src.configs import CONFIGS
 
 layers = ['conv5_2', 'conv5_3', 'pool5', 'fc6', 'fc7']
 layers = ['res5a']
 # lid = 4
 # sub_dirs = ['father-dau', 'father-son',  'mother-dau', 'mother-son']
 
-dir_root = io.sys_home() + '/Dropbox/Families_In_The_Wild/Database/journal_data/'
-dir_features = '/media/jrobby/Seagate Backup Plus Drive1/FIW_dataset/FIW_Extended/features/vgg_face/resnet/'
-dir_results = io.sys_home() + '/Dropbox/Families_In_The_Wild/Database/journal_results/verification/res_net/'
+dir_root = CONFIGS.path.dbroot
+dir_features = CONFIGS.path.dfeatures
+dir_results = CONFIGS.path.doutput
 io.mkdir(dir_results)
 
 dir_pairs = dir_root + "Pairs/folds_5splits/"
