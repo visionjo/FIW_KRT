@@ -8,11 +8,14 @@ from __future__ import print_function
 import glob
 import pandas as pd
 import numpy as np
-import src.common.image as imutils
-import src.common.io as io
-import src.common.log as log
+import common.image as imutils
+import common.io as io
+import common.log as log
 import operator
 import csv
+import random
+from sklearn.model_selection import KFold
+
 
 # TODO urllib.request to handle thrown exceptions <p>Error: HTTP Error 403: Forbidden</p>
 # TODO modify fold2set with optional args that spefify which fold merges into which set (i.e., currently hard coded).
@@ -198,6 +201,20 @@ def set_pairs(mylist, ids_in, kind, fid):
     return mylist
 
 
+def split_families(fids, nfolds=5, shuffle=True, seed=123):
+    kf = KFold(nfolds, shuffle=False, random_state=seed)
+    if shuffle:
+        fids = random.shuffle(fids)
+    # return kf.get_n_splits(fids)
+
+    shuffle=True
+    kf = KFold(5, shuffle=shuffle, random_state=123)
+    for train, test in kf.split(fids):
+        print("%s %s" % (train, test))
+
+
+
+
 def specify_gender(rel_mat, genders, gender):
     """
     :param rel_mat:
@@ -206,9 +223,14 @@ def specify_gender(rel_mat, genders, gender):
     :type gender:   str
     :return:
     """
-    ids_not = [j for j, s in enumerate(genders) if gender not in s]
-    rel_mat[ids_not, :] = 0
-    rel_mat[:, ids_not] = 0
+    ids_not=[]
+    for j, s in enumerate(genders):
+        print(j, s)
+        if gender not in s:
+            ids_not.append(j)
+    # ids_not = [j for j, s in enumerate(genders) if gender not in s]
+    # rel_mat[ids_not, :] = 0
+    # rel_mat[:, ids_not] = 0
 
     return rel_mat
 

@@ -3,8 +3,8 @@ import numpy as np
 # import cv2
 import matplotlib.pyplot as plt
 import os
-import src.common.io as io
-import src.common.utilities as utils
+import common.io as io
+import common.utilities as utils
 import csv
 import matplotlib.image as mpimg
 import tempfile

@@ -612,7 +612,7 @@ def batch_predict(net, Imgs):
 
 
 def backward_pass(net, dzdy, source_layer_index=-1, target_layer_index=0):
-    # Pass in data for backpropagation. Default is the last layer (source)
+    # Pass in data for backpropagation. Default is the last layer (dsource)
     # to the first layer (target)
     #
     # Note: Currently only supports last layer to target layer

@@ -4,7 +4,7 @@ from __future__ import print_function
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-import src.common.io as io
+import io as io
 from configparser import ConfigParser, ExtendedInterpolation
 from collections import namedtuple
 import warnings as warn
