@@ -1,10 +1,6 @@
-import glob
 import pickle
 
-import numpy as np
-
-import src.common.io as io
-import src.data.fiw as fiw
+import fiwtools.data.fiw as fiw
 import pandas as pd
 
 file_fold = ['0.csv', '1.csv', '2.csv', '3.csv', '4.csv']
