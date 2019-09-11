@@ -81,8 +81,13 @@ class AngleLoss(nn.Module):
         output[index] -= cos_theta[index]*(1.0+0)/(1+self.lamb)
         output[index] += phi_theta[index]*(1.0+0)/(1+self.lamb)
 
+<<<<<<< HEAD
         logpt = F.log_softmax(output)
         logpt = logpt.gather(1,target)
+=======
+        logpt = F.log_softmax(output, 1)
+        logpt = logpt.gather(1, target)
+>>>>>>> d5d57c0ffdab6a2eac16d8809ae66bd6ab8f5f19
         logpt = logpt.view(-1)
         pt = Variable(logpt.data.exp())
 

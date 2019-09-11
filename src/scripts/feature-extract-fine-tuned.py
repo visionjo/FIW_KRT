@@ -6,10 +6,10 @@
 from __future__ import print_function
 import numpy as np
 import glob
-import src.common.io as io
+import fiwtools.utils.io as io
 
 import os
-import src.common.log as log
+import fiwtools.utils.log as log
 import src.frameworks.pycaffe.net_wrapper as cw
 import src.frameworks.pycaffe.tools as caffe_tools
 

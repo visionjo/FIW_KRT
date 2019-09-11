@@ -13,7 +13,7 @@ import os
 from warnings import warn
 import numpy as np
 import pickle
-import src.common.utilities as utils
+import fiwtools.utils.utilities as utils
 import csv
 import scipy.io
 

@@ -173,7 +173,7 @@ By downloading the image data you agree to the following terms:
 
    
 ## Authors
-* **Joseph Robinson** - [Github](https://github.com/huskyjo) - [web](http://www.jrobsvision.com)
+* **Joseph Robinson** - [Github](https://github.com/visionjo) - [web](http://www.jrobsvision.com)
 
 ######
 ### Contact

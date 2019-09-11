@@ -2,7 +2,7 @@ from __future__ import print_function
 from sklearn.model_selection import KFold
 import pandas as pd
 import numpy as np
-import src.common.io as io
+import fiwtools.utils.io as io
 import argparse
 
 if __name__ == "__main__":
