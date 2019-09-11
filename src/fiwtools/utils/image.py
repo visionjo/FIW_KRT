@@ -1,15 +1,11 @@
 from __future__ import print_function
 import numpy as np
-# import cv2
+import cv2
 import matplotlib.pyplot as plt
 import os
-<<<<<<< HEAD:src/common/image.py
-import common.io as io
-import common.utilities as utils
-=======
+
 import fiwtools.utils.io as io
-import fiwtools.utils.utilities as utils
->>>>>>> master:src/fiwtools/utils/image.py
+import fiwtools.utils.common as utils
 import csv
 import matplotlib.image as mpimg
 import tempfile
