@@ -1,8 +1,21 @@
+<<<<<<< HEAD:src/fiwdb/helpers.py
+import fiwdb.database as db
+import numpy as np
+import common.log as log
+=======
 import fiwtools.fiwdb.database as db
 import numpy as np
 import fiwtools.utils.log as log
+>>>>>>> master:src/fiwtools/fiwdb/helpers.py
 logger = log.setup_custom_logger(__name__)
 logger.debug('Parse FIW')
+
+
+def check_gender_label(genders, single_char=True):
+    """    """
+    success = np.all([True if len(gender) == 1 & str(gender).islower() else False for gender in genders])
+    return success, [gender[0].lower() for gender in genders]
+
 
 def check_npairs(npairs, ktype, fid):
     """

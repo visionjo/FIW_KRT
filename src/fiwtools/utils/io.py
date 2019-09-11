@@ -143,7 +143,7 @@ def sys_home():
 
     :return: Home directory (platform agnostic)
     """
-    return os.path.expanduser("~")
+    return os.path.expanduser("~") + os.path.pathsep
 
 
 def mkdir(output):

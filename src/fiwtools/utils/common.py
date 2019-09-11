@@ -4,7 +4,11 @@ from __future__ import print_function
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+<<<<<<< HEAD:src/common/utilities.py
+import io as io
+=======
 import io
+>>>>>>> master:src/fiwtools/utils/common.py
 from configparser import ConfigParser, ExtendedInterpolation
 from collections import namedtuple
 import warnings as warn
