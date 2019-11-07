@@ -1,0 +1,3 @@
+[submodule "label-tool/java-gui"]
+	path = label-tool/java-gui
+	url = https://github.com/visionjo/Subject_Labeler.git
