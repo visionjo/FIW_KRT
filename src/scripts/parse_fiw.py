@@ -2,9 +2,9 @@
 
 # Script to parse different pair types for kin verification.
 # TODO refactor
-import fiwtools.data.fiw as fiw
-import fiwtools.fiwdb.database as db
-import fiwtools.utils.log as log
+import src.fiwtools.data.fiw as fiw
+import src.fiwtools.fiwdb.database as db
+import src.fiwtools.utils.log as log
 
 logger = log.setup_custom_logger(__name__, f_log='fiw_error_new.log', level=log.INFO)
 
@@ -21,14 +21,14 @@ logger = log.setup_custom_logger(__name__, f_log='fiw_error_new.log', level=log.
 #     """
 
 # log = logging.getLogger(__name__)
-from fiwtools import utils as io
+import src.fiwtools.utils.io as io
 
-out_bin = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/journal_data/Pairs/"
+out_bin = io.sys_home() + "/master-version/fiwdb/Pairs/"
 
 io.mkdir(out_bin)
-dir_fids = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/journal_data/FIDs/"
-dir_fid = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
-logger.info("Output Bin: {}\nFID folder: {}\n Anns folder: {}".format(out_bin, dir_fids, dir_fid))
+dir_fids = io.sys_home() + "/master-version/fiwdb/FIDs/"
+# dir_fid = io.sys_home() + "/master-version/fiwdb/Ann/FIW_FIDs/"
+logger.info("Output Bin: {}\nFID folder: {}".format(out_bin, dir_fids))
 do_sibs = True
 do_parent_child = True
 do_gparent_gchild = True

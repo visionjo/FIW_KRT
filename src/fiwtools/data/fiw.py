@@ -5,15 +5,15 @@ import numpy as np
 import pandas as pd
 import csv
 
-from fiwtools.utils import io
-import fiwtools.fiwdb.database as db
-import fiwtools.fiwdb.helpers as helpers
-from fiwtools.fiwdb import load_fids
+from src.fiwtools.utils import io
+import src.fiwtools.fiwdb.database as db
+import src.fiwtools.fiwdb.helpers as helpers
+from src.fiwtools.fiwdb.database import load_fids
 
 from collections import defaultdict
-import fiwtools.utils.log as log
-from fiwtools.utils import sys_home as dir_home
-from fiwtools.data import fiw
+import src.fiwtools.utils.log as log
+from src.fiwtools.utils.io import sys_home as dir_home
+from src.fiwtools.data import fiw
 
 logger = log.setup_custom_logger(__name__)
 logger.debug('Parse FIW')
@@ -166,8 +166,8 @@ def parse_siblings(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild
 
         for ids in sib_ids:
             # remove if brother or sister pair
-            if ('Male' in genders[ids[0]] and 'Male' in genders[ids[1]]) or \
-                    ('Female' in genders[ids[0]] and 'Female' in genders[ids[1]]):
+            if ('m' in genders[ids[0]] and 'f' in genders[ids[1]]) or \
+                    ('f' in genders[ids[0]] and 'm' in genders[ids[1]]):
                 print("Removing", ids)
                 sibling_ids.remove(ids)
 
@@ -235,11 +235,13 @@ def parse_brothers(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild
         rel_mat = db.parse_relationship_matrices(df_mids[i])
         genders = list(df_mids[i].Gender)
         # zero out female subjects
-        rel_mat = db.specify_gender(rel_mat, genders, 'Male')
+        rel_mat = db.specify_gender(rel_mat, genders, 'm')
 
         brother_ids = np.where(rel_mat == 2)
-
+        if len(brother_ids[0]) == 0:
+            continue
         if not helpers.check_npairs(len(brother_ids[1]), kind, fid):
+            print('Error Pair' + fid)
             continue
         # add to list of brothers
         brothers = db.set_pairs(brothers, brother_ids, kind, fid)
@@ -276,7 +278,7 @@ def parse_sisters(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/
         genders = list(df_mids[i].Gender)
 
         # zero out female subjects
-        rel_mat = db.specify_gender(rel_mat, genders, 'Female')
+        rel_mat = db.specify_gender(rel_mat, genders, 'f')
 
         sister_ids = np.where(rel_mat == 2)
 
@@ -372,9 +374,9 @@ def accumulate(l):
 
             except IndexError:
                 print()
-            if "Male" in p_genders[0] and "Female" in p_genders[1]:
+            if "m" in p_genders[0] and "f" in p_genders[1]:
                 pars_ids = (pids[0][1] + 1, pids[1][1] + 1)
-            elif "Male" in p_genders[1] and "Female" in p_genders[0]:
+            elif "m" in p_genders[1] and "f" in p_genders[0]:
                 pars_ids = pids[1][1] + 1, pids[0][1] + 1
             else:
                 logger.error("Parents of same gender in {}. {}".format(fid, pids))
@@ -393,7 +395,7 @@ def accumulate(l):
     return fmd, fms
 
 
-def parse_parents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/Database/FIDs/', f_mids='mid.csv'):
+def parse_parents(dir_data, f_mids='mid.csv'):
     """
     Parse sister pairs by referencing member ID LUT and relationship matrix.
 
@@ -450,9 +452,9 @@ def parse_parents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/
 
             p_gender = genders[p_mid - 1]
             c_gender = genders[c_mid - 1]
-            if 'Female' in p_gender:
+            if 'm' in p_gender:
                 # fathers
-                if 'Female' in c_gender:
+                if 'm' in c_gender:
                     # son
                     md.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='fs'))
                 else:
@@ -460,7 +462,7 @@ def parse_parents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_Wild/
                     ms.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='fd'))
             else:
                 # mothers
-                if 'Female' in c_gender:
+                if 'm' in c_gender:
                     fd.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='ms'))
                 else:
                     fs.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='md'))
@@ -527,9 +529,9 @@ def parse_grandparents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_
 
             p_gender = genders[p_mid - 1]
             c_gender = genders[c_mid - 1]
-            if 'Female' in p_gender:
+            if 'f' in p_gender:
                 # fathers
-                if 'Female' in c_gender:
+                if 'f' in c_gender:
                     # son
                     gfgs.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='gmgd'))
                 else:
@@ -537,7 +539,7 @@ def parse_grandparents(dir_data='/Users/josephrobinson//Dropbox/Families_In_The_
                     gfgd.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='gmgs'))
             else:
                 # mothers
-                if 'Female' in c_gender:
+                if 'f' in c_gender:
                     gmgs.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='gfgd'))
                 else:
                     gmgd.append(db.Pair(mids=(p_mid, c_mid), fid=fid, kind='gfgd'))
@@ -600,20 +602,17 @@ def prepare_fids(dir_fid=dir_home() + "/Dropbox/Families_In_The_Wild/Database/An
 
 if __name__ == '__main__':
 
-    out_bin =  dir_home() + "/Dropbox/Families_In_The_Wild/Database/Pairs/"
-    dir_fids = dir_home() + "/Dropbox/Families_In_The_Wild/Database/FIDs/"
-    dir_fid = dir_home() + "/Dropbox/Families_In_The_Wild/Database/Ann/FW_FIDs/"
+    out_bin =  dir_home() + "/master-version/fiwdb/Pairs/"
+    dir_fids = dir_home() + "/master-version/fiwdb/FIDs/"
+    dir_fid = dir_home() + "/master-version/fiwdb/Ann/FW_FIDs/"
 
-    dir_families = '/Users/josephrobinson/Dropbox/Families_In_The_Wild/Database/FIDs_NEW/'
-
-
+    dir_families = '/master-version/fiwdb/FIDs/'
     fams = fiw.load_families(dir_families)
-    exit(0)
     logger.info("Output Bin: {}\nFID folder: {}\n Anns folder: {}".format(out_bin, dir_fids, dir_fid))
 
-    do_sibs = False
+    do_sibs = True
     do_save = True
-    parse_fids = True
+    parse_fids = False
     logger.info("Parsing siblings: {}\nSaving Pairs: {}\n Parse FIDs: {}".format(do_sibs, do_save, parse_fids))
     if parse_fids:
         df_fam = prepare_fids(dir_fid=dir_fid, dirs_out=dir_fids)
@@ -664,7 +663,7 @@ if __name__ == '__main__':
             df_all_faces.to_csv(out_bin + 'sibs-faces.csv', index=False)
 
         del sibs, pair_set, df_all_faces
-    if False:
+    # if False:
         print("Parsing Grandparents")
         gfgd, gfgs, gmgd, gmgs = parse_grandparents(dir_data=dir_fids)
         fd_set = db.Pairs(gfgd, kind='gfgd')
@@ -694,32 +693,32 @@ if __name__ == '__main__':
         df_all_faces.to_csv(out_bin + 'gmgs-faces.csv', index=False)
         print(len(df_all_faces))
 
-    if False:
+        # if False:
         print("Parsing Parents")
         fd, fs, md, ms = parse_parents(dir_data=dir_fids)
 
-        fd_set = db.db.Pairs(fd, kind='fd')
+        fd_set = db.Pairs(fd, kind='fd')
         df_all_faces = get_face_pairs(dir_fids, fd_set.df_pairs)
         fd_set.write_pairs(out_bin + "fd-pairs.csv")
         df_all_faces.to_csv(out_bin + 'fd-faces.csv', index=False)
         print(len(df_all_faces))
         del df_all_faces
 
-        fs_set = db.db.Pairs(fs, kind='fs')
+        fs_set = db.Pairs(fs, kind='fs')
         df_all_faces = get_face_pairs(dir_fids, fs_set.df_pairs)
         fs_set.write_pairs(out_bin + "fs-pairs.csv")
         df_all_faces.to_csv(out_bin + 'fs-faces.csv', index=False)
         print(len(df_all_faces))
         del df_all_faces
 
-        md_set = db.db.Pairs(md, kind='md')
+        md_set = db.Pairs(md, kind='md')
         df_all_faces = get_face_pairs(dir_fids, md_set.df_pairs)
         md_set.write_pairs(out_bin + "md-pairs.csv")
         df_all_faces.to_csv(out_bin + 'md-faces.csv', index=False)
         print(len(df_all_faces))
         del df_all_faces
 
-        ms_set = db.db.Pairs(ms, kind='ms')
+        ms_set = db.Pairs(ms, kind='ms')
         df_all_faces = get_face_pairs(dir_fids, ms_set.df_pairs)
         ms_set.write_pairs(out_bin + "ms-pairs.csv")
         df_all_faces.to_csv(out_bin + 'ms-faces.csv', index=False)

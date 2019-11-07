@@ -3,8 +3,8 @@ import numpy as np
 # import cv2
 import matplotlib.pyplot as plt
 import os
-import fiwtools.utils.io as io
-import fiwtools.utils.utilities as utils
+import src.fiwtools.utils.io as io
+import src.fiwtools.utils as utils
 import csv
 import matplotlib.image as mpimg
 import tempfile
