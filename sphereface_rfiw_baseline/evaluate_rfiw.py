@@ -81,10 +81,22 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', default=32, type=int, help='training batch size')
     parser.add_argument('--modelpath', default='finetuned/checkpoint.pth.tar', type=str,
                         help='the pretrained model to point to')
-    parser.add_argument('--label_dir', '-l', type=str, default=sys_home() + '/datasets/FIW/RFIW/val/pairs/',
-                            help='Root directory of data (assumed to containing pairs list labels)')
-    parser.add_argument('--data_dir', '-d', type=str, default=sys_home() + '/datasets/FIW/RFIW/val/',
-                        help='Root directory of data (assumed to contain valdata)')
+    parser.add_argument(
+        '--label_dir',
+        '-l',
+        type=str,
+        default=f'{sys_home()}/datasets/FIW/RFIW/val/pairs/',
+        help='Root directory of data (assumed to containing pairs list labels)',
+    )
+
+    parser.add_argument(
+        '--data_dir',
+        '-d',
+        type=str,
+        default=f'{sys_home()}/datasets/FIW/RFIW/val/',
+        help='Root directory of data (assumed to contain valdata)',
+    )
+
 
     args = parser.parse_args()
 
@@ -100,15 +112,12 @@ if __name__ == "__main__":
     f, axes = plt.subplots(nrows, ncols, sharex='all', sharey='all')
 
     for i, id in enumerate(do_types):
-        if i < ncols:
-            ax = axes[0, i]
-        else:
-            ax = axes[1, i - ncols]
-        csv_file = os.path.join(args.label_dir, types[id] + '_val.csv')
+        ax = axes[0, i] if i < ncols else axes[1, i - ncols]
+        csv_file = os.path.join(args.label_dir, f'{types[id]}_val.csv')
         loader = get_val_loader(args.data_dir, csv_file)
         # f.subplot()
         auc_score = validate(net, loader, ax)
 
-        print('{} pairs: {} (auc)'.format(types[id], auc_score))
+        print(f'{types[id]} pairs: {auc_score} (auc)')
 
     plt.savefig('roc.png')

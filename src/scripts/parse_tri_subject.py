@@ -20,12 +20,7 @@ def combine_face_pairs(dirs_fid, tri_pairs, header=('p1', 'p2', 'p3')):
         faces2 = [p.replace(dirs_fid + "/", "").replace(dirs_fid, "") for p in paths2]
         faces3 = [p.replace(dirs_fid + "/", "").replace(dirs_fid, "") for p in paths3]
         # print(faces1, faces2)
-        for x, y, z in zip(faces1, faces2, faces3):
-            all_faces.append([x, y, z])
-            # for y in faces2:
-            #     for z in faces3:
-            #         all_faces.append([x, y, z])
-                # [[x, y] for x, y in zip(faces1, faces2)]
+        all_faces.extend([x, y, z] for x, y, z in zip(faces1, faces2, faces3))
     arr_all_face = np.array(all_faces)
     return pd.DataFrame({header[0]: arr_all_face[:, 0], header[1]: arr_all_face[:, 1], header[2]: arr_all_face[:, 2]})
     # arr_pairs = np.array(all_faces)
@@ -43,25 +38,25 @@ dir_fids = io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/FIDs_New/"
 
 
 do_save = False
-logger.info("Parsing Tri-Subject Pairs:\n\t{}\n\t{}\n".format(out_bin, dir_fids))
+logger.info(f"Parsing Tri-Subject Pairs:\n\t{out_bin}\n\t{dir_fids}\n")
 
 fmd, fms = fiw.tri_subjects(dir_data=dir_fids)
-logger.info("{}".format(out_bin, dir_fids))
+logger.info(f"{out_bin}")
 # pair_set.write_pairs(out_bin + "sibs-pairs.csv")
 # df_all_faces.to_csv(out_bin + 'sibs-faces.csv', index=False)
 if do_save:
     fiw.write_list_tri_pairs(out_bin + "fmd-pairs.csv", fmd)
     fiw.write_list_tri_pairs(out_bin + "fms-pairs.csv", fms)
 print(len(fmd))
-for index in range(0, 5):
-    print(str(fmd[index]))
+for index in range(5):
+    print(fmd[index])
 print(len(fms))
-for index in range(0, 5):
-    print(str(fms[index]))
+for index in range(5):
+    print(fms[index])
 
 df_all_faces = combine_face_pairs(dir_fids, fmd, header=('F', 'M', 'D'))
 df_all_faces.to_csv(out_bin + 'fmd-faces.csv', index=False)
-logger.info("Parsing Tri-Subject Pairs:\n\t{}\n\t{}\n".format(out_bin, dir_fids))
+logger.info(f"Parsing Tri-Subject Pairs:\n\t{out_bin}\n\t{dir_fids}\n")
 
 del df_all_faces
 

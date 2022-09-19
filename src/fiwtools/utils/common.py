@@ -50,7 +50,7 @@ def parse(cfile=None):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         cfile = os.path.join(dir_path, 'my_bb_configs.ini')
 
-    print('Loading configs: ' + cfile)
+    print(f'Loading configs: {cfile}')
     parser = ConfigParser(interpolation=ExtendedInterpolation())
     parser.read(cfile)
 
@@ -66,14 +66,14 @@ def print_configs(opts, header=''):
     """
     if header:
         print('\n###############################################################\n')
-        print('\t########\t {} \t########\n'.format(header))
+        print(f'\t########\t {header} \t########\n')
         print('###############################################################\n')
 
     for field in opts._fields:
         if len(field) < 8:
-            print('\t{}\t\t\t:\t{}\n'.format(field, getattr(opts, field)))
+            print(f'\t{field}\t\t\t:\t{getattr(opts, field)}\n')
         else:
-            print('\t{}\t\t:\t{}\n'.format(field, getattr(opts, field)))
+            print(f'\t{field}\t\t:\t{getattr(opts, field)}\n')
 
 
 def show(img_display, img, lmarks, frontal_raw, face_proj, background_proj, temp_proj2_out_2, sym_weight):
@@ -137,7 +137,7 @@ class Configurations:
             dir_path = os.path.dirname(os.path.realpath(__file__))
             configs_file = os.path.join(dir_path, 'my_bb_configs.ini')
 
-        print('Loading configs: ' + configs_file)
+        print(f'Loading configs: {configs_file}')
         # parser = ConfigParser(interpolation=ExtendedInterpolation())
         # parser.read(configs_file)
 
@@ -155,7 +155,7 @@ class Configurations:
                 :return namedtuple with configs set as proper type
         """
         if io.is_file(f_configs) is False:
-            warn.warn('configs (INI) file does not exist: ' + f_configs)
+            warn.warn(f'configs (INI) file does not exist: {f_configs}')
             return None
 
     @staticmethod
@@ -167,13 +167,13 @@ class Configurations:
         """
         if header:
             print('\n###############################################################\n')
-            print('\t########\t {} \t########\n'.format(header))
+            print(f'\t########\t {header} \t########\n')
             print('###############################################################\n')
         for fld in configs._fields:
             if len(fld) < 8:
-                print('\t{}\t\t\t:\t{}\n'.format(fld, getattr(configs, fld)))
+                print(f'\t{fld}\t\t\t:\t{getattr(configs, fld)}\n')
             else:
-                print('\t{}\t\t:\t{}\n'.format(fld, getattr(configs, fld)))
+                print(f'\t{fld}\t\t:\t{getattr(configs, fld)}\n')
 
     @staticmethod
     def get_caffe_configs(f_configs, header='NetOpts'):
