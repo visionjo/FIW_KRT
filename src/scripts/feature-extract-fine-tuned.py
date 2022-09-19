@@ -33,9 +33,9 @@ overwrite = False
 layers = ['fc5', 'conv5_5', 'conv5_4']
 for l in layers:
 
-    dout = output + "/" + l + "/"
+    dout = f"{output}/{l}/"
     io.mkdir(dout)
-    logger.info("Output Directory: {}\nInput Image Directory: {}\n".format(output, input))
+    logger.info(f"Output Directory: {output}\nInput Image Directory: {input}\n")
 
     io.mkdir(dout)
     if mode == 'gpu':
@@ -46,14 +46,14 @@ for l in layers:
 
     for ptype in types:
         # each pair type
-        print("Processing image pairs of type {}".format(ptype))
+        print(f"Processing image pairs of type {ptype}")
         # dir_images = []
         dir_images = input + ptype + "/"
         io.mkdir(dout + ptype)
         # dirs_fid, fids = fiwdb.load_fids(dir_images)
-        im_files = glob.glob(dir_images + "/*.jpg")
+        im_files = glob.glob(f"{dir_images}/*.jpg")
         feat_files = [dout + str(f).replace(input, "").replace(".jpg", ".csv") for f in im_files]
-        print("{} faces to extract features from.".format(len(feat_files)))
+        print(f"{len(feat_files)} faces to extract features from.")
         # import pdb
         # pdb.set_trace()
         nimages = len(im_files)
@@ -63,14 +63,9 @@ for l in layers:
             if os.path.exists(f_file):
                 continue
             print(f_file)
-            # layers = layers
-            # ofile = dout + str(ifile).replace(input, "").replace(".jpg", ".csv")
-            # if not io.mkdir(io.parent_dir(f_file)):
-                # continue
-                # continue
             # if os.path.isfile(in_file):
 
-            logger.info("Extracting feature for: {}\n".format(in_file))
+            logger.info(f"Extracting feature for: {in_file}\n")
             fname = io.file_base(in_file)
 
             image = caffe_tools.load_prepare_resnet_centerloss(in_file, (112, 96))
@@ -81,7 +76,7 @@ for l in layers:
 
             # io.mkdir(io.filepath(in_file))
             feat = my_net.net.blobs[l].data[0]
-            logger.info("Writing feature to disk: {}\n".format(f_file))
+            logger.info(f"Writing feature to disk: {f_file}\n")
 
             np.savetxt(f_file, feat.flatten(), delimiter=',')  # X is an array
 

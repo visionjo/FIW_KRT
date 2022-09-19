@@ -12,9 +12,7 @@ def read_mscelebnames(f_names):
     nss = []
     for n in ns:
         if len(n) > 1:
-            nname = ""
-            for nn in n:
-                nname += " " + nn.split("@")[0]
+            nname = "".join(" " + nn.split("@")[0] for nn in n)
             nss.append(nname)
         else:
             print(str(n).split("@")[0])
@@ -49,14 +47,11 @@ fids_tup = [(fids_df.iloc[r]['FIDs'], fids_df.iloc[r]['surnames'].lower().split(
 fids_dict = dict(fids_tup)
 fids = list(fids_dict.keys())
 
-surnames={}
-for k, v in fids_dict.items():
-    surnames[k] = v[0]
-
+surnames = {k: v[0] for k, v in fids_dict.items()}
 allnames = []
 allfids = []
 counter = 0
-for i, fid in enumerate(fids):
+for fid in fids:
     ns = dict_names[fid]
     allfids.append((fid, surnames[fid]))
     for n in ns:
@@ -71,38 +66,33 @@ clist = [(n.split()[-1], n.split()[:-1]) for n in celebnames if len(n) > 1]
 
 cnlist = []
 for cc in clist:
-    for c in cc[1]:
-        cnlist.append((cc[0], c))
-
+    cnlist.extend((cc[0], c) for c in cc[1])
 # flist = [r.lower().split('.') for r in fids_df['surnames']]
 
 ids = np.zeros(len(allnames))
 
 ddict = defaultdict(list)
-for j, fid in enumerate(allnames):
-
+for fid in allnames:
     # ddict[fid[0]].append()
     for i, n in enumerate(cnlist):
-        if fid[0] == n[0]:
-            # for k, nn in enumerate(name):
-            if n[1] == fid[1]:
-                # print(nn, ' : ', fids['surnames'][j], " : ", name_list[i])
-                print(n, ' : ', fid, " : ", cnlist[i])
+        if fid[0] == n[0] and n[1] == fid[1]:
+            # print(nn, ' : ', fids['surnames'][j], " : ", name_list[i])
+            print(n, ' : ', fid, " : ", cnlist[i])
 
 
 
 ids = np.zeros(len(allnames))
 
-for j, fid in enumerate(dict_names.keys()):
+for fid in dict_names.keys():
     names = [n.lower() for n in dict_names[fid]]
     surname = list(fids_df['surnames'][fids_df['FIDs'] == fid])
-    if len(surname) == 0:
+    if not surname:
         continue
     surname = surname[0]
     name = surname.lower().split('.')
     for i, n in enumerate(nlist):
         if name[0] == n[-1].lower():
-            for k, nn in enumerate(name):
+            for nn in name:
                 if n[0] == nn:
                     # print(nn, ' : ', fids['surnames'][j], " : ", name_list[i])
                     print(nn, ' : ', surname, " : ", nlist[i])

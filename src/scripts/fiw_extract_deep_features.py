@@ -26,9 +26,13 @@ if __name__ == "__main__":
                         default="/home/jrobby/Dropbox/Families_In_The_Wild/python/models/VGG_FACE_deploy.prototxt")
     parser.add_argument('-w', '--weights', help="File path to weights (i.e., *.caffemodel).",
                         default="/home/jrobby/Dropbox/Families_In_The_Wild/python/models/VGG_FACE.caffemodel")
-    parser.add_argument('-i', '--input',
-                        default=io.sys_home() + "/Dropbox/Families_In_The_Wild/Database/FIDs/",
-                        help='Image directory.')
+    parser.add_argument(
+        '-i',
+        '--input',
+        default=f"{io.sys_home()}/Dropbox/Families_In_The_Wild/Database/FIDs/",
+        help='Image directory.',
+    )
+
     parser.add_argument('-o', '--output',
                         default="/media/jrobby/Seagate Backup Plus Drive1/FIW_dataset/FIW_Extended/feats/vgg_face/",
                         help='Directory in which output is store folder of features named after layer.')
@@ -38,23 +42,26 @@ if __name__ == "__main__":
 
     parser.add_argument('--overwrite', action='store_true', help="Overwrite existing files.")
     args = parser.parse_args()
-    dout = os.path.join(args.output, args.layer) + "/"
+    dout = f"{os.path.join(args.output, args.layer)}/"
 
-    logger.info("Output Directory: {}\nInput Image Directory: {}\n".format(args.output, args.input))
+    logger.info(
+        f"Output Directory: {args.output}\nInput Image Directory: {args.input}\n"
+    )
+
 
     io.mkdir(dout)
     my_net = cw.CaffeWrapper(model_def=args.model_def, gpu_id=args.gpu_id, mode=args.mode, model_weights=args.weights,
                           do_init=True)
 
     dirs_fid, fids = fiwdb.load_fids(args.input)
-    ifiles = glob.glob(args.input + "*/MID*/*.jpg")
+    ifiles = glob.glob(f"{args.input}*/MID*/*.jpg")
     ofiles = [dout + str(f).replace(args.input, "").replace(".jpg", ".csv") for f in ifiles]
     # layers = args.layers
     for ifile in ifiles:
         ofile = dout + str(ifile).replace(args.input, "").replace(".jpg", ".csv")
         if os.path.isfile(ofile):
             continue
-        logger.info("Extracting features: {}\n".format(ofile))
+        logger.info(f"Extracting features: {ofile}\n")
         fname = io.file_base(ifile)
 
         image = caffe_tools.load_prepare_image_vgg(ifile)

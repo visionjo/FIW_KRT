@@ -51,22 +51,24 @@ if __name__ == '__main__':
     pids = [myio.file_base(p) for p in f_pids]
     # f_prefix =list( np.array(f_prefix)[ids])
     npids = len(pids)
-    print("Processing {} images".format(npids))
+    print(f"Processing {npids} images")
 
     # Second argument indicates that we should upsample the image 1 time (i.e., bigger image to detect of more faces).
     dets = [cnn_face_detector(io.imread(f), 1) for f in f_pids]
 
     df = pd.DataFrame(columns=['FID', 'PID', 'face_id', 'filename', 'left', 'top', 'right', 'bottom', 'confidence'])
 
-    print("Number of faces detected: {}".format(len(dets)))
+    print(f"Number of faces detected: {len(dets)}")
     counter = 0
     for faces, prefix in zip(dets, f_prefix):
         # build dataframe of face detections and corresponding metadata
         for i, d in enumerate(faces):
             f_name = prefix + str(i)
             df.loc[counter] = [fids[counter], pids[counter], i,  f_name, d.rect.left(), d.rect.top(), d.rect.right(), d.rect.bottom(), d.confidence]
-            print("Detection {}: Left: {} Top: {} Right: {} Bottom: {} Confidence: {}".format(
-                i, d.rect.left(), d.rect.top(), d.rect.right(), d.rect.bottom(), d.confidence))
+            print(
+                f"Detection {i}: Left: {d.rect.left()} Top: {d.rect.top()} Right: {d.rect.right()} Bottom: {d.rect.bottom()} Confidence: {d.confidence}"
+            )
+
             rects = dlib.rectangles()
             rects.extend([d.rect for d in dets])
 

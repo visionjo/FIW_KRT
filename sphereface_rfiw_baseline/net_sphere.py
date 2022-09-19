@@ -53,8 +53,7 @@ class AngleLinear(nn.Module):
 
         cos_theta = cos_theta * xlen.view(-1,1)
         phi_theta = phi_theta * xlen.view(-1,1)
-        output = (cos_theta,phi_theta)
-        return output # size=(B,Classnum,2)
+        return cos_theta, phi_theta
 
 
 class AngleLoss(nn.Module):

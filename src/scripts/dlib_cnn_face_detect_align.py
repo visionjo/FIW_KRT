@@ -26,8 +26,8 @@ import pandas as pd
 
 print("DLIB's CNN FACE DETECTOR: START")
 dir_root = "Families_In_The_Wild/Database/"
-dir_images = dir_root + "Images/"
-dir_det_out = dir_root + "F0664/"
+dir_images = f"{dir_root}Images/"
+dir_det_out = f"{dir_root}F0664/"
 
 # instantiate CNN face detector
 f_model = "~/Documents/dlib-19.6/mmod_human_face_detector.dat"
@@ -46,7 +46,7 @@ fids = [myio.file_base(myio.filepath(p)) for p in f_pids]
 pids = [myio.file_base(p) for p in f_pids]
 # f_prefix =list( np.array(f_prefix)[ids])
 npids = len(f_pids)
-print("Processing {} images".format(npids))
+print(f"Processing {npids} images")
 
 # images = [io.imread(f) for f in f_pids]
 
@@ -68,19 +68,18 @@ df = pd.DataFrame(columns=['FID', 'PID', 'face_id', 'filename', 'left', 'top', '
 # '''
 predictor_path = "shape_predictor_68_face_landmarks.dat"
 sp = dlib.shape_predictor(predictor_path)
-print("Number of faces detected: {}".format(len(dets)))
-counter = 0
-for faces, prefix in zip(dets, f_prefix):
+print(f"Number of faces detected: {len(dets)}")
+for counter, (faces, prefix) in enumerate(zip(dets, f_prefix)):
     img = io.imread(counter)
     for i, d in enumerate(faces):
         f_name = prefix + str(i)
         df.loc[counter] = [fids[counter], pids[counter], i, f_name, d.rect.left(), d.rect.top(), d.rect.right(),
                            d.rect.bottom(), d.confidence]
-        print("Detection {}: Left: {} Top: {} Right: {} Bottom: {} Confidence: {}".format(
-            i, d.rect.left(), d.rect.top(), d.rect.right(), d.rect.bottom(), d.confidence))
+        print(
+            f"Detection {i}: Left: {d.rect.left()} Top: {d.rect.top()} Right: {d.rect.right()} Bottom: {d.rect.bottom()} Confidence: {d.confidence}"
+        )
+
         shape = sp(img, d)
         dlib.save_face_chip(img, shape, dir_det_out + f_name + ".jpg")
-
-    counter += 1
 
 df.to_csv("dnn_face_detections_bb_2.csv")

@@ -15,18 +15,18 @@ features = ['fc5'] # ''conv5_2', 'conv5_3', 'pool5', 'fc6', 'fc7']
 sub_dirs = ['father-dau']#, 'father-son',  'mother-dau', 'mother-son']
 
 dir_root = '/media/jrobby/Seagate Backup Plus Drive1/DATA/Kinship/KinFaceW-II/'
-dir_features = dir_root + '/features/fine-tuned/'
+dir_features = f'{dir_root}/features/fine-tuned/'
 
-dir_results = dir_features + 'results_spca/'
+dir_results = f'{dir_features}results_spca/'
 io.mkdir(dir_results)
 
-dir_perms = dir_root + 'perm/'
-dir_lists = dir_root + 'meta_data/'
+dir_perms = f'{dir_root}perm/'
+dir_lists = f'{dir_root}meta_data/'
 
 do_pca = True
 k = 200
 # load experimental settings for 5-fold verification
-f_lists = glob.glob(dir_lists + "*.csv")
+f_lists = glob.glob(f"{dir_lists}*.csv")
 pair_types = [io.file_base(f) for f in f_lists]
 
 dir_feats = [dir_features + p + "/" for p in sub_dirs]
@@ -63,9 +63,7 @@ for ids in fold_list:
             test_feats2 = feats2[test_ids]
             feats = []
             for f1, f2 in zip(train_feats1[train_labels == 1], train_feats1[train_labels == 1]):
-                feats.append(f1)
-                feats.append(f2)
-
+                feats.extend((f1, f2))
             # all_feats = {**tuple(trfeats1), **tuple(trfeats2)}
             print("Normalizing Features")
             feat_vecs = np.array(feats)
@@ -110,13 +108,13 @@ for ids in fold_list:
             print('Saving Results')
             dir_out = dir_result + str(fold) + "/"
             io.mkdir(dir_out)
-            np.savetxt(dir_out + "fpr.csv", fpr)
-            np.savetxt(dir_out + "tpr.csv", tpr)
-            np.savetxt(dir_out + "roc_auc.csv", [roc_auc])
+            np.savetxt(f"{dir_out}fpr.csv", fpr)
+            np.savetxt(f"{dir_out}tpr.csv", tpr)
+            np.savetxt(f"{dir_out}roc_auc.csv", [roc_auc])
             accs[jj] = roc_auc
         fpr, tpr, _ = roc_curve(np.array(ts_matches).flatten(), np.array(sim).flatten())
         roc_auc = auc(fpr, tpr)
-        np.savetxt(dir_result + "fpr.csv", fpr)
-        np.savetxt(dir_result + "tpr.csv", tpr)
-        np.savetxt(dir_result + "roc_auc.csv", [accs.mean()])
-        np.savetxt(dir_result + "acc.csv", [accs.mean()])
+        np.savetxt(f"{dir_result}fpr.csv", fpr)
+        np.savetxt(f"{dir_result}tpr.csv", tpr)
+        np.savetxt(f"{dir_result}roc_auc.csv", [accs.mean()])
+        np.savetxt(f"{dir_result}acc.csv", [accs.mean()])

@@ -33,10 +33,7 @@ def file_ext(filename):
     (head, tail) = os.path.split(filename)
     try:
         parts = string.rsplit(tail, '.', 2)
-        if len(parts) == 3:
-            ext = '.%s.%s' % (parts[1], parts[2])  # # tar.gz
-        else:
-            ext = '.' + parts[1]
+        ext = f'.{parts[1]}.{parts[2]}' if len(parts) == 3 else f'.{parts[1]}'
     except:
         ext = None
 
@@ -118,7 +115,7 @@ def readcsv(infile, separator=','):
 def readlist(infile):
     """Read each row of file as an element of the list"""
     with open(infile, 'r') as f:
-        list_of_rows = [r for r in f.readlines()]
+        list_of_rows = list(f.readlines())
     return list_of_rows
 
 
@@ -178,7 +175,10 @@ def videolist(videodir):
 
 def writecsv(list_of_tuples, outfile, mode='w', separator=','):
     """Write list of tuples to output csv file with each list element on a row and tuple elements separated by comma"""
-    list_of_tuples = list_of_tuples if not is_numpy(list_of_tuples) else list_of_tuples.tolist()
+    list_of_tuples = (
+        list_of_tuples.tolist() if is_numpy(list_of_tuples) else list_of_tuples
+    )
+
     with open(outfile, mode) as f:
         for u in list_of_tuples:
             n = len(u)
@@ -214,7 +214,7 @@ def check_paths(*paths):
     do_exist = True
     for x, path in enumerate(paths):
         if not os.path.isfile(path):
-            warn.warn(str(x) + ") File not found: " + path)
+            warn.warn(f"{str(x)}) File not found: {path}")
             do_exist = False
 
     return do_exist

@@ -19,10 +19,8 @@ for i, fin in enumerate(file_fold):
     files_feats = [dir_feats + f for f in split_info_pd['Var1']]
 
     feats = fiw.load_all_features(dir_feats, split_info_pd['Var1'])
-    pickling_on = open(dir_info + file_out[i], "wb")
-
-    pickle.dump(feats, pickling_on)
-    pickling_on.close()
+    with open(dir_info + file_out[i], "wb") as pickling_on:
+        pickle.dump(feats, pickling_on)
 
 #
 # pd.read_table()
