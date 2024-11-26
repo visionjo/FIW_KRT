@@ -15,10 +15,7 @@ def load_all_features(dir_features, f_features):
     :return: set of features
     :rtype: dict
     """
-    feats = []
-    for file in f_features:
-        feats.append(read_feature(dir_features + file))
-
+    feats = [read_feature(dir_features + file) for file in f_features]
     return np.array(feats)
 
 

@@ -44,7 +44,7 @@ class CaffeWrapper:
         """set members."""
         if not model_root:
             file_parts = os.path.split(model_def)
-            self.model_root = file_parts[0] + '/'
+            self.model_root = f'{file_parts[0]}/'
             self.model_def = model_def
             self.model_weights = model_weights
         else:
@@ -85,12 +85,18 @@ class CaffeWrapper:
 
         if not os.path.isfile(self.model_def):
             self.is_init = False
-            warnings.warn('Caffe_Wrapper.init(): model definition file does not exit: ' + self.model_def)
+            warnings.warn(
+                f'Caffe_Wrapper.init(): model definition file does not exit: {self.model_def}'
+            )
+
             return
 
         if not os.path.isfile(self.model_weights):
             self.is_init = False
-            warnings.warn('Caffe_Wrapper.init(): model weights file does not exit: ' + self.model_weights)
+            warnings.warn(
+                f'Caffe_Wrapper.init(): model weights file does not exit: {self.model_weights}'
+            )
+
             return
         self.net = caffe.Net(self.model_def,  # defines structure of model
                              self.model_weights,  # contains the trained weights
@@ -115,9 +121,7 @@ class CaffeWrapper:
 
         # self.net.forward_all( data = img )
         self.net.blobs['data'].data[...] = img
-        prob = self.net.blobs['prob'].data[0]
-
-        return prob
+        return self.net.blobs['prob'].data[0]
 
     def extract_features(self, image, output_layer='fc7'):
         """
@@ -132,8 +136,8 @@ class CaffeWrapper:
         # check whether net has been initialized
         if not self.is_init:
             self.init()
-            if not self.is_init:
-                return None
+        if not self.is_init:
+            return None
 
         self.net.blobs['data'].data[...] = image
 
@@ -155,8 +159,8 @@ class CaffeWrapper:
         # check whether net has been initialized
         if not self.is_init:
             self.init()
-            if not self.is_init:
-                return None
+        if not self.is_init:
+            return None
 
         self.net.blobs['data'].data[...] = image
 
@@ -180,9 +184,9 @@ class CaffeWrapper:
         # check whether net has been initialized
         if not self.is_init:
             self.init()
-            if not self.is_init:
-                # if still not initialized, then return
-                return None
+        if not self.is_init:
+            # if still not initialized, then return
+            return None
 
         transformer = caffe.io.Transformer({'data': self.net.blobs['data'].data.shape})
         transformer.set_mean('data', self.avg)
@@ -225,7 +229,7 @@ class CaffeWrapper:
         :return: layer names
         :rtype: [string]
         """
-        return [layer for layer in self.net.params.keys()]
+        return list(self.net.params.keys())
         ########################################################################################################################
         ###                                                                                                                  ###
         ###                                                 Visualization                                                    ###
