@@ -1,7 +1,7 @@
 # FIW API
 Families In the Wild: A Kinship Recognition Toolbox. Visit FIW project page to download and learn more! 
 
-[https://web.northeastern.edu/smilelab/fiw/](https://web.northeastern.edu/smilelab/fiw/)
+[https://fulab.sites.northeastern.edu/families-in-the-wild-a-kinship-recognition-benchmark/](https://fulab.sites.northeastern.edu/families-in-the-wild-a-kinship-recognition-benchmark/)
 
 **Version 1.0**
 
@@ -10,18 +10,18 @@ This document must be completed, i.e., work in progress, as is the API itself.
 [![N|Solid](reports/teaser_image.jpg)](reports/teaser_image.jpg)
 ------------
 ## Overview
-This API serves as the main codebase for the kinship effort with the FIW database. In addition, below is a detailed description of the database (i.e., data and label) structure.
+This API serves as the main codebase for the kinship effort with the FIW database. Below is a detailed description of the database (i.e., data, and label) structure.
 
 ## Families In the Wild (FIW) Data and Labels
 This documentation describes FIW DB and (working) development kit. This is a work in progress (i.e., still to come are FIW-CNN models, updated benchmarks, more in README (this), and more).
 
-Check out FIW [project page](https://web.northeastern.edu/smilelab/fiw/index.html)
+Check out FIW [project page](https://fulab.sites.northeastern.edu/families-in-the-wild-a-kinship-recognition-benchmark/)
 
 ### Download
-Download [here](https://web.northeastern.edu/smilelab/fiw/download.html)
+Download [here](https://fulab.sites.northeastern.edu/fiw-download/)
 
 ### Details of the data
-See publications below. A more complete list of references can be found [here](https://web.northeastern.edu/smilelab/fiw/publications.html)
+Please take a look at the publications below. A more complete list of references can be found [here](https://fulab.sites.northeastern.edu/fiw-papers/)
 
 ## Reference
 
