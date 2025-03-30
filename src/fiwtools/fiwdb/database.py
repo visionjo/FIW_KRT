@@ -43,22 +43,25 @@ def download_images(f_pid_csv=dir_db + "FIW_PIDs_new.csv", dir_out=dir_db + "fiw
     :type dir_out: object
     """
 
-    logger.info("FIW-DB-- Download_images!\n Source: {}\n Destination: {}".format(f_pid_csv, dir_out))
+    logger.info(
+        f"FIW-DB-- Download_images!\n Source: {f_pid_csv}\n Destination: {dir_out}"
+    )
+
     # load urls (image location), pids (image name), and fids (output subfolder)
     df_pid = load_pid_lut(str(f_pid_csv))
 
     df_io = df_pid[['FIDs', 'PIDs', 'URL']]
 
-    logger.info("{} photos to download".format(int(df_io.count().mean())))
+    logger.info(f"{int(df_io.count().mean())} photos to download")
 
     for i, img_url in enumerate(df_io['URL']):
         try:
             f_out = str(dir_out) + df_io['FIDs'][i] + "/" + df_io['PIDs'][i] + ".jpg"
             img = imutils.url_to_image(img_url)
-            logger.info("Downloading {}\n{}\n".format(df_io['PIDs'][i], img_url))
+            logger.info(f"Downloading {df_io['PIDs'][i]}\n{img_url}\n")
             imutils.saveimage(f_out, img)
         except Exception as e0:
-            logger.error("Error with {}\n{}\n".format(df_io['PIDs'][i], img_url))
+            logger.error(f"Error with {df_io['PIDs'][i]}\n{img_url}\n")
             error_message = "<p>Error: %s</p>\n" % str(e0)
             logger.error(error_message)
 
@@ -153,7 +156,7 @@ def get_relationship_dictionaries(dir_fid,fids, f_csv='mid.csv'):
     """
 
     dict_relationships = {}
-    for i, fid in enumerate(fids):
+    for fid in fids:
         df_relationships = pd.read_csv(dir_fid + '/' + fid + '/' + f_csv)
         df_relationships.index = range(1, len(df_relationships) + 1)
         df_relationships = df_relationships.ix[:, 1:len(df_relationships) + 1]
@@ -170,7 +173,7 @@ def get_names_dictionaries(dir_fid,fids, f_csv='mid.csv'):
     """
 
     dict_names = {}
-    for i, fid in enumerate(fids):
+    for fid in fids:
         df_relationships = pd.read_csv(dir_fid + '/' + fid + '/' + f_csv)
         dict_names[fid] = list(df_relationships['Name'])
 
@@ -216,7 +219,7 @@ def split_families(fids, nfolds=5, shuffle=True, seed=123):
     shuffle=True
     kf = KFold(5, shuffle=shuffle, random_state=123)
     for train, test in kf.split(fids):
-        print("%s %s" % (train, test))
+        print(f"{train} {test}")
 
 
 
@@ -249,7 +252,7 @@ def folds_to_sets(f_csv=dir_db + 'journal_data/Pairs/folds_5splits/', dir_out=di
     for file in f_in:
         # each list of pairs <FOLD, LABEL, PAIR_1, PAIR_2>
         f_name = io.file_base(file)
-        print("\nProcessing {}\n".format(f_name))
+        print(f"\nProcessing {f_name}\n")
 
         df_pairs = pd.read_csv(file)
 
@@ -266,8 +269,9 @@ def folds_to_sets(f_csv=dir_db + 'journal_data/Pairs/folds_5splits/', dir_out=di
         df_test.to_csv(dir_out + "test/" + f_name.replace("-folds", "-test") + ".csv")
 
         # print stats
-        print("{} Training;\t {} Val;\t{} Test".format(df_train['fold'].count(), df_val['fold'].count(),
-                                                       df_test['fold'].count()))
+        print(
+            f"{df_train['fold'].count()} Training;\t {df_val['fold'].count()} Val;\t{df_test['fold'].count()} Test"
+        )
 
 
 def parsing_families(f_csv='mid.csv'):
@@ -287,7 +291,7 @@ def parsing_families(f_csv='mid.csv'):
     # df2 = pd.DataFrame(columns=('FID','MID','val', 'nrel'))
     fam_list2 = []
     tr_mids = []
-    for i, df in enumerate(df_mid):
+    for df in df_mid:
         # vals = [d[0].values[:, 0:-2] for d in df]
         vals = df[0].values[:, 1:-2]
         # vals = np.zeros_like()
@@ -313,36 +317,49 @@ def parsing_families(f_csv='mid.csv'):
         # uz_df =
         fam_list.append((zip(*df), max_index, max_value, nrelationships))
 
-        mlist = ("MID" + str(int(mid)) for mid in mid_list if mid > 0)
+        mlist = (f"MID{int(mid)}" for mid in mid_list if mid > 0)
 
         if nrelationships >= 3:
-            fam_list2.append([df[1], "MID" + str(1 + max_index), max_value, nrelationships, "MID" + str(1 + max_index2), max_value2, np.size(np.nonzero(votes[max_index2,:])), zip(*mlist)])
+            fam_list2.append(
+                [
+                    df[1],
+                    f"MID{str(1 + max_index)}",
+                    max_value,
+                    nrelationships,
+                    f"MID{str(1 + max_index2)}",
+                    max_value2,
+                    np.size(np.nonzero(votes[max_index2, :])),
+                    zip(*mlist),
+                ]
+            )
+
             tr_mids.append((df[1], mlist))
 
-    ofile = open('ttest.csv', "w")
+    with open('ttest.csv', "w") as ofile:
+        writer = csv.writer(ofile, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
 
-    writer = csv.writer(ofile, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-
-    for row in fam_list2:
-        writer.writerow(row)
-    ofile.close()
-
+        for row in fam_list2:
+            writer.writerow(row)
     for fl in fam_list2:
         print(fl)
 
     df_fams = pd.DataFrame(fam_list, columns=['rel', 'MID', 'val', 'nrel'])
-    te_list = []
     tr_list = []
-    val_list = []
-    for tt in fam_list2:
-        te_list.append(glob.glob(dir_fid_root + tt[0] + "/" + tt[1] + "/*.jpg"))
+    te_list = [
+        glob.glob(dir_fid_root + tt[0] + "/" + tt[1] + "/*.jpg")
+        for tt in fam_list2
+    ]
+
+    val_list = [
+        glob.glob(dir_fid_root + tt[0] + "/" + tt[4] + "/*.jpg")
+        for tt in fam_list2
+    ]
 
     for tt in fam_list2:
-        val_list.append(glob.glob(dir_fid_root + tt[0] + "/" + tt[4] + "/*.jpg"))
-
-    for tt in fam_list2:
-        for ttt in list(tt[7:]):
-            tr_list.append(glob.glob(dir_fid_root + tt[0] + "/" + ttt + "/*.jpg"))
+        tr_list.extend(
+            glob.glob(dir_fid_root + tt[0] + "/" + ttt + "/*.jpg")
+            for ttt in list(tt[7:])
+        )
 
     with open('test_no_labels.list', 'w') as f:
         for _list in te_list:
@@ -351,7 +368,7 @@ def parsing_families(f_csv='mid.csv'):
             fid = _list[0][69:74]
             # for _string in _list:
             for token in _list:
-                f.write(str(token) + " " + fid + '\n')
+                f.write(f"{str(token)} " + fid + '\n')
 
     with open('val_no_labels.list', 'w') as f:
         for _list in val_list:
@@ -360,7 +377,7 @@ def parsing_families(f_csv='mid.csv'):
             fid = _list[0][69:74]
             # for _string in _list:
             for token in _list:
-                f.write(str(token) + " " + fid + '\n')
+                f.write(f"{str(token)} " + fid + '\n')
 
     with open('train.list', 'w') as f:
         for _list in tr_list:
@@ -369,7 +386,7 @@ def parsing_families(f_csv='mid.csv'):
             fid = _list[0][69:74]
             # for _string in _list:
             for token in _list:
-                f.write(str(token) + " " + fid + '\n')
+                f.write(f"{str(token)} " + fid + '\n')
 
                 #     print(io.parent_dir(_list))
                 # # f.seek(0)
@@ -385,8 +402,8 @@ class Pairs(object):
 
     @staticmethod
     def list2table(pair_list):
-        p1 = ['{}/MID{}'.format(pair.fid, pair.mids[0]) for pair in pair_list]
-        p2 = ['{}/MID{}'.format(pair.fid, pair.mids[1]) for pair in pair_list]
+        p1 = [f'{pair.fid}/MID{pair.mids[0]}' for pair in pair_list]
+        p2 = [f'{pair.fid}/MID{pair.mids[1]}' for pair in pair_list]
 
         return pd.DataFrame({'p1': p1, 'p2': p2})
 
@@ -409,7 +426,7 @@ class Pair(object):
         self.type = kind
 
     def __str__(self):
-        return "FID: {} ; MIDS: ({}, {}) ; Type: {}".format(self.fid, self.mids[0], self.mids[1], self.type)
+        return f"FID: {self.fid} ; MIDS: ({self.mids[0]}, {self.mids[1]}) ; Type: {self.type}"
 
     def __key(self):
         return self.mids[0], self.mids[1], self.fid, self.type
@@ -426,5 +443,3 @@ class Pair(object):
     def __lt__(self, other):
         return np.uint(self.fid[1::]) < np.uint(other.fid[1::])
 
-if __name__ == '__main__':
-    pass

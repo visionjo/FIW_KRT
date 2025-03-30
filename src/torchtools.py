@@ -5,7 +5,7 @@ import torch
 from fiwtools.utils import is_file, mkdir
 
 import shutil
-cuda = True if torch.cuda.is_available() else False
+cuda = bool(torch.cuda.is_available())
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 ByteTensor = torch.cuda.ByteTensor if cuda else torch.ByteTensor
 #
@@ -24,7 +24,7 @@ class TorchTools(object):
 
         if is_best:
             print("=> Saving a new best")
-            shutil.copy(checkpoint_dir + filename, checkpoint_dir + '/best_model.pth.tar')
+            shutil.copy(checkpoint_dir + filename, f'{checkpoint_dir}/best_model.pth.tar')
         else:
             print("=> Validation Accuracy did not improve")
 
@@ -32,14 +32,17 @@ class TorchTools(object):
     @staticmethod
     def load_checkpoint(net, f_weights='/Users/joseph.robinson/Documents/logs/checkpoint.pth.tar'):
         if is_file(f_weights):
-            print('Loading Checkpoint: ' + f_weights)
+            print(f'Loading Checkpoint: {f_weights}')
             if cuda:
                 checkpoint = torch.load(f_weights)
             else:
                 # Load GPU model on CPU
                 checkpoint = torch.load(f_weights, map_location=lambda storage, loc: storage)
                 net.load_state_dict(checkpoint['state_dict'])
-            print("=> loaded checkpoint '{}' (trained for {} epochs)".format(f_weights, checkpoint['epoch']))
+            print(
+                f"=> loaded checkpoint '{f_weights}' (trained for {checkpoint['epoch']} epochs)"
+            )
+
 
             return checkpoint['epoch'], checkpoint['best_acc']
 
@@ -128,10 +131,7 @@ class TorchTools(object):
 
     @staticmethod
     def count_parameters(model):
-        n = 0
-        for param in model.parameters():
-            n += param.numel()
-        return n
+        return sum(param.numel() for param in model.parameters())
 
     @staticmethod
     def get_checkpoint_string(index, dir='checkpoint', unformatted_path='encoder_{}_{:08d}.pth', epoch=True):

@@ -33,7 +33,7 @@ pair_types = [io.file_base(f).replace('-folds', '') for f in f_lists]
 
 # dir_feats = [dir_features + p + "/" for p in pair_types]
 import os
-for i in range(0, 11):
+for i in range(11):
     df_list = pd.read_csv(f_lists[i])
     pair_type = io.file_base(f_lists[i]).replace('-folds', '')
     labels = np.array(df_list.label)
@@ -81,9 +81,7 @@ for i in range(0, 11):
 
             feats = []
             for f1, f2 in zip(train_feats1[train_labels == 1], train_feats1[train_labels == 1]):
-                feats.append(f1)
-                feats.append(f2)
-
+                feats.extend((f1, f2))
             # all_feats = {**tuple(trfeats1), **tuple(trfeats2)}
             print("Normalizing Features")
             feat_vecs = np.array(set(feats))

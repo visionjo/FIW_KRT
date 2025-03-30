@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     df_pairs = pd.read_csv(args.input)
 
-    fids = list(set([fid[:5] for fid in list(df_pairs.p1)]))
+    fids = list({fid[:5] for fid in list(df_pairs.p1)})
 
     k_ids = kf.split(fids)
 

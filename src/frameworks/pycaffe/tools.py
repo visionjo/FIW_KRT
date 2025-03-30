@@ -101,9 +101,7 @@ def make_prediction_vgg(net, f_image, output_layer='prob'):
 
     # read and prepare image
     net.forward_all(data=img)
-    output = net.blobs[output_layer].data[0]
-
-    return output
+    return net.blobs[output_layer].data[0]
 
 
 def make_prediction_res(net, f_image, output_layer='fc1'):
@@ -157,11 +155,7 @@ def is_caffe_format(image):
     :return:            true/false pertaining to whether or not image is tensor (caffe formatted)
     """
 
-    if image.shape[0] == 1 or len(image.shape) == 4:
-        # if formatted for single image batch mode or 4 channels
-        return True
-    else:
-        return False
+    return image.shape[0] == 1 or len(image.shape) == 4
 
 
 def caffe2rgb(image):
@@ -257,11 +251,7 @@ def load_image_mean_shift(f_in, avg=np.array([129.1863, 104.7624, 93.5940]), net
     if img is None:
         warn('BBNet.load_prepare_image(): image file was not loaded. Exit() ')
         return None
-    if net_type.__eq__('vgg'):
-        img = img[:, :, ::-1] * 255.0
-    else:
-        img = img * 255.0
-
+    img = img[:, :, ::-1] * 255.0 if net_type.__eq__('vgg') else img * 255.0
     return img - avg  # subtract mean (numpy takes care of dimensions :)
 
 
@@ -304,14 +294,12 @@ def top_k_class_indices(score_vector, k=1, get_scores=False):
 
     ids = sorted(range(len(score_vector)), key=lambda x: score_vector[x])
     ids = ids[::-1]  # reverse order to be in descending order
-    top_k_ids = np.asarray(ids[0:k])
+    top_k_ids = np.asarray(ids[:k])
 
-    if get_scores:
-        score_vector[::-1].sort()
-        top_scores = score_vector[0:k]
-        return top_k_ids, top_scores
-    else:
+    if not get_scores:
         return top_k_ids
+    score_vector[::-1].sort()
+    return top_k_ids, score_vector[:k]
 
 
 def get_class_labels(f_labels):
@@ -340,8 +328,7 @@ def read_pickle_labels(pfile):
     values = [i[0] for i in items]
     keys = [int(i[1]) for i in items]
 
-    d = {key: value for (key, value) in zip(keys, values)}
-    return d
+    return dict(zip(keys, values))
 
 
 ########################################################################################################################
@@ -358,7 +345,7 @@ def read_bin(f_binary):
     """
 
     if not os.path.isfile(f_binary):
-        warn('CaffeWrapper.read_bin(): binary file does not exit: ' + f_binary)
+        warn(f'CaffeWrapper.read_bin(): binary file does not exit: {f_binary}')
         return []
 
     proto_data = open(f_binary, "rb").read()
@@ -378,14 +365,14 @@ def check_avg_type(s_avg):
     """
     if os.path.isfile(s_avg):
         f_obj = open(s_avg, 'rb')
-        avg = pickle.load(f_obj)
+        return pickle.load(f_obj)
     else:
         sp_avg = s_avg.replace('[', '').replace(']', '').split(',')
-        if utils.is_number(sp_avg[0]):
-            avg = np.array([float(sp_avg[0]), float(sp_avg[1]), float(sp_avg[2])])
-        else:
-            avg = s_avg
-    return avg
+        return (
+            np.array([float(sp_avg[0]), float(sp_avg[1]), float(sp_avg[2])])
+            if utils.is_number(sp_avg[0])
+            else s_avg
+        )
 
 
 ########################################################################################################################
@@ -420,9 +407,8 @@ def get_network_name(f_in):
 
     if net_type == "name":
         return value
-    else:
-        warn('Name of network not found. Exit("")')
-        return ""
+    warn('Name of network not found. Exit("")')
+    return ""
 
 
 def find_layer(lines):
@@ -482,7 +468,7 @@ def get_layers(net):
     :rtype: [string]
     """
 
-    return [layer for layer in net.params.keys()]
+    return list(net.params.keys())
 
 
 ########################################################################################################################
@@ -561,15 +547,14 @@ def Init_Caffe(use_gpu=False, deviceID=0):
 
 
 def Load_Network(dataset):
-    if dataset == 'VGG-Face':
-        ModelDir = '/proj/loki/bdecann/loki/sandbox/bdecann/whitebox/' + \
-                   'VGG-Face/'
-        net_model_path = os.path.join(ModelDir,
-                                      'VGG_FACE_WITHOUT_SOFTMAX_deploy.prototxt')
-        net_weights_path = os.path.join(ModelDir, 'VGG_FACE.caffemodel')
-    else:
+    if dataset != 'VGG-Face':
         raise ValueError('Test dataset not recognized')
 
+    ModelDir = '/proj/loki/bdecann/loki/sandbox/bdecann/whitebox/' + \
+               'VGG-Face/'
+    net_model_path = os.path.join(ModelDir,
+                                  'VGG_FACE_WITHOUT_SOFTMAX_deploy.prototxt')
+    net_weights_path = os.path.join(ModelDir, 'VGG_FACE.caffemodel')
     return caffe.Net(net_model_path, net_weights_path, caffe.TEST)
 
 
@@ -588,12 +573,7 @@ def Predict(net, I, flag=0):
     # Forward Pass
     out = net.forward()[L[-1]].flatten()
 
-    if flag == 0:
-        # Return the label
-        return np.argmax(out)
-    else:
-        # Return the weights / scores
-        return out
+    return np.argmax(out) if flag == 0 else out
 
 
 def batch_predict(net, Imgs):
@@ -617,13 +597,13 @@ def backward_pass(net, dzdy, source_layer_index=-1, target_layer_index=0):
     #
     # Note: Currently only supports last layer to target layer
     B = GetBlobNames(net)
-    L = list(net._layer_names)
-
     net.blobs[B[source_layer_index]].diff[...] = dzdy
 
     if target_layer_index == 0:
         out = net.backward()
     else:
+        L = list(net._layer_names)
+
         out = net.backward(end=L[target_layer_index])
 
     return out[B[target_layer_index]]

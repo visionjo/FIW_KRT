@@ -71,9 +71,7 @@ def read(img_file):
     :param img_file: filepath of image to open and return
     :type img_file: string
     """
-    if not io.is_file(img_file):
-        return None
-    return mpimg.imread(img_file)
+    return mpimg.imread(img_file) if io.is_file(img_file) else None
 
 
 def reshape(img, im_dims, rgb=True):
@@ -137,7 +135,7 @@ def temp(ext='jpg'):
     """Create a temporary image with the given extension"""
     if ext[0] == '.':
         ext = ext[1:]
-    return tempfile.mktemp() + '.' + ext
+    return f'{tempfile.mktemp()}.{ext}'
 
 
 def temp_png():
@@ -162,13 +160,12 @@ def writejet(img, imfile=None):
     if imfile is None:
         imfile = temp_png()
 
-    if utils.is_numpy(img):
-        if img.ndim == 2:
-            cv2.imwrite(imfile, rgb2bgr(gray2jet(img)))
-        else:
-            raise ValueError('Input must be a 2D numpy array')
-    else:
+    if not utils.is_numpy(img):
         raise ValueError('Input must be numpy array')
+    if img.ndim == 2:
+        cv2.imwrite(imfile, rgb2bgr(gray2jet(img)))
+    else:
+        raise ValueError('Input must be a 2D numpy array')
     return imfile
 
 
@@ -176,17 +173,16 @@ def writegray(img, imfile=None):
     """Write a floating point grayscale numpy image as [0,255] grayscale"""
     if imfile is None:
         imfile = temp_png()
-    if utils.is_numpy(img):
-        if img.dtype == np.dtype('uint8'):
-            # Assume that uint8 is in the range [0,255]
-            cv2.imwrite(imfile, img)
-        elif img.dtype == np.dtype('float32'):
-            # Convert [0,1.0] to uint8 [0,255]
-            cv2.imwrite(imfile, np.uint8(img * 255.0))
-        else:
-            raise ValueError('Unsupported datatype - Numpy array must be uint8 or float32')
-    else:
+    if not utils.is_numpy(img):
         raise ValueError('Input must be numpy array')
+    if img.dtype == np.dtype('uint8'):
+        # Assume that uint8 is in the range [0,255]
+        cv2.imwrite(imfile, img)
+    elif img.dtype == np.dtype('float32'):
+        # Convert [0,1.0] to uint8 [0,255]
+        cv2.imwrite(imfile, np.uint8(img * 255.0))
+    else:
+        raise ValueError('Unsupported datatype - Numpy array must be uint8 or float32')
     return imfile
 
 
@@ -197,11 +193,7 @@ def write(img, imfile=None, writeas=None):
     if not utils.is_numpy(img):
         raise ValueError('image must by numpy object')
     if writeas is None:
-        if img.ndim == 2:
-            writeas = 'gray'
-        else:
-            writeas = 'bgr'
-
+        writeas = 'gray' if img.ndim == 2 else 'bgr'
     if writeas in ['jet']:
         writejet(img, imfile)
     elif writeas in ['gray']:

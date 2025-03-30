@@ -15,10 +15,7 @@ def pre_label_weight(pre, gnd, pthresh=0.95, coverage='yes', threshold='no'):
     resultList = []
     TotalLabelCnt = 0
     for i in range(pre.shape[0]):
-        if pind[i] == yind[i]:
-            label = '1'
-        else:
-            label = '-1'
+        label = '1' if pind[i] == yind[i] else '-1'
         weight = 1.0
         resultList.append((plog[i], label, weight))
         TotalLabelCnt = TotalLabelCnt + weight
@@ -33,11 +30,11 @@ def pre_label_weight(pre, gnd, pthresh=0.95, coverage='yes', threshold='no'):
         predict = result[0]
         label = result[1]
         weight = result[2]
-        if label == '1':
-            tp += weight
         if label == '-1':
             fp += weight
 
+        elif label == '1':
+            tp += weight
         precision = float(tp) / float(tp + fp)
         coverage = float(tp + fp) / TotalLabelCnt
 
@@ -59,9 +56,9 @@ def pre_label_weight(pre, gnd, pthresh=0.95, coverage='yes', threshold='no'):
         stepsize = 1
 
     coverageV = coverageList[0:len(coverageList):stepsize]
-    coverageV.append(coverageList[len(coverageList) - 1])
+    coverageV.append(coverageList[-1])
     accuracyV = precisionList[0:len(precisionList):stepsize]
-    accuracyV.append(precisionList[len(precisionList) - 1])
+    accuracyV.append(precisionList[-1])
 
     return coverageV, accuracyV, coverage, threshold_select
 
@@ -144,15 +141,14 @@ def white_noise(X):
 
 ## load label map
 def LabelMapping(lbl_map_path):
-    file = open(lbl_map_path)
-    labelmap = {}
-    while 1:
-        line = file.readline()
-        cols = line.rstrip().split('\t')
-        if not line:
-            break
-        labelmap[cols[0]] = cols[1]
-    file.close()
+    with open(lbl_map_path) as file:
+        labelmap = {}
+        while 1:
+            line = file.readline()
+            cols = line.rstrip().split('\t')
+            if not line:
+                break
+            labelmap[cols[0]] = cols[1]
     return labelmap
 
 
@@ -170,46 +166,42 @@ def dense_to_one_hot(labels_dense, num_classes):
 
 
 def data_generate(label_path, data_path, num_classes, repmat):
-    pkl_label = open(label_path, 'rb')
-    pkl_data = open(data_path, 'rb')
-    labels = pickle.load(pkl_label)
-    labels_np = np.array(labels, dtype=int)
+    with open(label_path, 'rb') as pkl_label:
+        with open(data_path, 'rb') as pkl_data:
+            labels = pickle.load(pkl_label)
+            labels_np = np.array(labels, dtype=int)
 
-    data = pickle.load(pkl_data)
-    data_np = np.array(data, dtype=np.float32)
+            data = pickle.load(pkl_data)
+            data_np = np.array(data, dtype=np.float32)
 
-    labels_bn = dense_to_one_hot(labels_np, num_classes)
-    # labels_bn1 = labels_bn
-    # data_np1 = data_np
+            labels_bn = dense_to_one_hot(labels_np, num_classes)
+                # labels_bn1 = labels_bn
+                # data_np1 = data_np
 
-    if repmat == 1:
-        for i in range(1, 8):
-            # data_np = white_noise(data_np)#masking_noise(data_np1, 1)
-            labels_bn = np.concatenate((labels_bn, labels_bn), axis=0)
-            data_np = np.concatenate((data_np, data_np), axis=0)
+            if repmat == 1:
+                for _ in range(1, 8):
+                    # data_np = white_noise(data_np)#masking_noise(data_np1, 1)
+                    labels_bn = np.concatenate((labels_bn, labels_bn), axis=0)
+                    data_np = np.concatenate((data_np, data_np), axis=0)
 
-    pkl_data.close()
-    pkl_label.close()
     return data_np, labels_bn
 
 
 def data_generate2(label_path, data_path, num_classes, repmat):
-    pkl_label = open(label_path, 'rb')
-    pkl_data = open(data_path, 'rb')
-    labels = pickle.load(pkl_label)
-    labels_np = np.array(labels, dtype=int)
+    with open(label_path, 'rb') as pkl_label:
+        with open(data_path, 'rb') as pkl_data:
+            labels = pickle.load(pkl_label)
+            labels_np = np.array(labels, dtype=int)
 
-    data = pickle.load(pkl_data)
-    data_np = np.array(data, dtype=np.float32)
+            data = pickle.load(pkl_data)
+            data_np = np.array(data, dtype=np.float32)
 
-    labels_bn = dense_to_one_hot(labels_np, num_classes)
-    if repmat == 1:
-        for i in range(1, 8):
-            labels_bn = np.concatenate((labels_bn, labels_bn), axis=0)
-            data_np = np.concatenate((data_np, data_np), axis=0)
+            labels_bn = dense_to_one_hot(labels_np, num_classes)
+            if repmat == 1:
+                for _ in range(1, 8):
+                    labels_bn = np.concatenate((labels_bn, labels_bn), axis=0)
+                    data_np = np.concatenate((data_np, data_np), axis=0)
 
-    pkl_data.close()
-    pkl_label.close()
     return data_np, labels_bn, labels
 
 
